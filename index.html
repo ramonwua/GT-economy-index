@@ -1,36 +1,444 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GT Economy Index</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0a0f17">
+<title>GT Economy Index | Growtopia Market Monitor</title>
 <style>
-:root{color-scheme:dark;--bg:#0b1017;--panel:#121b27;--line:#263548;--text:#eef4fb;--muted:#94a6ba;--green:#39d9a1}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,Arial,sans-serif}
-main{max-width:1100px;margin:auto;padding:28px 18px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{display:flex;align-items:center;gap:12px}.logo{display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#39d9a1,#6ba8ff);color:#07131a;font-weight:900}.muted{color:var(--muted)}.tag{border:1px solid #355345;background:#122a25;color:#8df0c3;padding:5px 9px;border-radius:99px;font-size:12px}
-h1{font-size:18px;letter-spacing:.08em;margin:0}h2{font-size:28px;letter-spacing:-.04em;margin:32px 0 5px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:17px}.label{font-size:12px;color:var(--muted)}.value{font-size:24px;font-weight:750;margin-top:5px}.green{color:var(--green)}.panel{margin-top:14px}.panelhead{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.tabs button{background:#1a2635;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer}.tabs button.active{background:#315143;border-color:#39d9a1}canvas{width:100%;height:280px;display:block;margin-top:16px}table{border-collapse:collapse;width:100%;margin-top:12px;font-size:13px}td,th{text-align:left;padding:9px;border-bottom:1px solid var(--line)}th{font-size:11px;color:var(--muted)}.note{background:#1a2635;border:1px solid var(--line);padding:12px;border-radius:10px;font-size:12px;color:#c4d0dd;margin-top:14px}.foot{text-align:center;font-size:11px;color:var(--muted);margin:25px 0}
-@media(max-width:700px){.cards{grid-template-columns:repeat(2,1fr)}main{padding:18px 12px}.value{font-size:21px}canvas{height:230px}}
+:root{--bg:#090e15;--panel:#111925;--line:#243143;--text:#e8eef7;--muted:#8796aa;--green:#45d6a0;--red:#ff7185;--blue:#79a9ff;--amber:#f0c36a}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 15% 0%,#172b3c 0,transparent 35%),var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.shell{max-width:1400px;margin:auto;padding:24px}
+header{display:flex;justify-content:space-between;align-items:center;gap:15px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:#183448;border:1px solid #31536a;color:var(--green);font-weight:900;font-size:18px}
+h1{font-size:17px;margin:0;letter-spacing:.6px}
+.brand p{margin:3px 0 0;color:var(--muted);font-size:10px;letter-spacing:1.6px;text-transform:uppercase}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid #344459;background:#172231;color:var(--text);border-radius:9px;padding:9px 13px;font-size:12px;font-weight:650}
+.btn:hover{border-color:var(--green)}
+.btn.primary{background:#173b35;border-color:#2b7460;color:#a5f3d6}
+.hero{display:flex;justify-content:space-between;align-items:end;gap:16px;padding:28px 0 20px}
+.eyebrow{font-size:10px;color:var(--muted);letter-spacing:1.8px;text-transform:uppercase;font-weight:750}
+h2{font-size:27px;line-height:1.2;margin:7px 0}
+.hero p{margin:0;color:var(--muted);font-size:13px}
+.datepill{font-size:11px;border:1px solid var(--line);border-radius:9px;padding:9px 12px;color:#b4c1d2;white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.card,.panel{background:linear-gradient(145deg,#131d2a,#0f1621);border:1px solid var(--line);border-radius:14px;min-width:0}
+.card{padding:17px}
+.label{color:#9eacbd;font-size:12px}
+.value{font-size:26px;font-weight:780;letter-spacing:-.7px;margin:10px 0 3px;overflow-wrap:anywhere}
+.foot{font-size:11px;color:var(--muted)}
+.green{color:var(--green)!important}.red{color:var(--red)!important}.amber{color:var(--amber)!important}
+.main{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(260px,.8fr);gap:12px;margin-top:12px}
+.panel{overflow:hidden}
+.panelhead{padding:17px 18px 13px;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line)}
+.paneltitle{font-size:14px;font-weight:750;margin:0}
+.sub{font-size:11px;color:var(--muted);margin-top:4px}
+.ranges{display:flex;gap:3px;padding:3px;border:1px solid var(--line);border-radius:9px;background:#0a1018}
+.ranges button{border:0;border-radius:6px;padding:6px 9px;background:transparent;color:var(--muted);font-size:11px}
+.ranges button.active{background:#2a3b50;color:white}
+.chartstats{display:flex;gap:25px;flex-wrap:wrap;padding:13px 18px 0}
+.chartstats span{font-size:10px;color:var(--muted)}
+.chartstats strong{display:block;color:var(--text);font-size:13px;margin-top:3px}
+.chartwrap{height:310px;padding:10px 12px}
+canvas{display:block;width:100%;height:100%}
+.legend{padding:0 18px 15px;font-size:11px;color:var(--muted)}
+.legend i{display:inline-block;width:18px;height:3px;background:var(--green);vertical-align:middle;margin-right:6px}
+.bodypad{padding:16px}
+.signal{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid var(--line)}
+.signal:last-child{border:0}
+.signalicon{flex-shrink:0;width:32px;height:32px;border-radius:9px;background:#18283a;border:1px solid #30445b;display:grid;place-items:center;color:var(--blue)}
+.signal strong{font-size:12px}
+.signal p{margin:4px 0 0;color:var(--muted);font-size:11px}
+.section{margin-top:12px}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.field{background:#0b121c;border:1px solid #2b3a4d;border-radius:8px;padding:9px 10px;color:var(--text);min-width:0}
+.search{width:240px}
+.tablewrap{overflow:auto}
+table{width:100%;border-collapse:collapse;white-space:nowrap}
+th,td{text-align:right;padding:12px 16px;border-bottom:1px solid #202c3b;font-size:12px}
+th{background:#0e1621;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.8px}
+th:first-child,td:first-child{text-align:left}
+tbody tr:hover{background:#172332}
+.tag{display:inline-block;border:1px solid #34485f;border-radius:6px;background:#192637;padding:3px 6px;color:#b8cde3;font-size:10px}
+.tablefoot{padding:12px 16px;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.note{margin-top:12px;padding:15px 17px;background:#19170f;border:1px solid #403922;border-radius:12px;color:#c2b99f;font-size:11px}
+.note strong{color:#f0dba1}
+footer{padding:20px 2px 5px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#6e7c90;font-size:11px}
+.backdrop{display:none;position:fixed;inset:0;background:#02060bdd;z-index:5;align-items:center;justify-content:center;padding:16px}
+.backdrop.open{display:flex}
+.modal{width:min(500px,100%);max-height:90vh;overflow:auto;background:#121c29;border:1px solid #34465b;border-radius:15px;padding:20px}
+.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.modalhead h3{margin:0;font-size:17px}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.formitem{display:flex;flex-direction:column;gap:6px}
+.formitem label{font-size:11px;color:#a8b6c8}
+.formitem input,.formitem select{width:100%}
+.help{font-size:11px;color:var(--muted);margin-top:12px}
+.modalactions{display:flex;justify-content:flex-end;gap:8px;margin-top:17px}
+.toast{position:fixed;bottom:20px;right:20px;z-index:8;background:#18352e;border:1px solid #39715f;border-radius:9px;padding:12px 16px;display:none;color:#baf4df;font-size:12px;max-width:calc(100% - 40px)}
+.toast.show{display:block}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.main{grid-template-columns:1fr}}
+@media(max-width:560px){.shell{padding:13px}header{align-items:flex-start}.actions{flex-direction:column}.actions .btn{padding:8px}.hero{align-items:flex-start;flex-direction:column;padding-top:22px}h2{font-size:23px}.card{padding:13px}.value{font-size:21px}.panelhead{align-items:flex-start;flex-direction:column}.chartwrap{height:255px}.search{width:100%}.formgrid{grid-template-columns:1fr}th,td{padding:11px 12px}}
 </style>
 </head>
-<body><main>
-<header class="top"><div class="brand"><div class="logo">GT</div><div><h1>GT ECONOMY INDEX</h1><div class="muted" style="font-size:12px">Growtopia price intelligence · IDR / DL</div></div></div><span class="tag">PROTOTYPE</span></header>
-<h2>DL Market Overview</h2><div class="muted">Indeks harga historis berdasarkan data kontributor, bukan harga resmi game.</div>
-<section class="cards">
-<div class="card"><div class="label">Harga terakhir</div><div class="value">Rp845</div><div class="muted" style="font-size:12px">25 Oktober 2026</div></div>
-<div class="card"><div class="label">Perubahan Oktober</div><div class="value green">+69,0%</div><div class="muted" style="font-size:12px">Rp500 → Rp845</div></div>
-<div class="card"><div class="label">Median Oktober</div><div class="value">Rp820</div><div class="muted" style="font-size:12px">25 observasi harian</div></div>
-<div class="card"><div class="label">Tertinggi Oktober</div><div class="value">Rp870</div><div class="muted" style="font-size:12px">23 Oktober 2026</div></div>
+<body>
+<div class="shell">
+<header>
+  <div class="brand">
+    <div class="logo">GT<span style="font-size:10px">/</span></div>
+    <div><h1>GT ECONOMY INDEX</h1><p>Growtopia Market Monitor</p></div>
+  </div>
+  <div class="actions">
+    <button class="btn" id="exportBtn">↓ Export CSV</button>
+    <button class="btn primary" id="addBtn">＋ Tambah Data</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div>
+    <div class="eyebrow">Market Overview / Indonesia</div>
+    <h2>Digital Economy, Measured.</h2>
+    <p>Pemantauan harga komunitas Growtopia dalam Rupiah.</p>
+  </div>
+  <div class="datepill" id="asOf">DATA TERBARU · —</div>
 </section>
-<section class="panel"><div class="panelhead"><div><b>Harga DL (IDR)</b><div class="muted" style="font-size:12px" id="description">Harga harian · Oktober 2026</div></div><div class="tabs"><button data-range="1M" class="active">1M</button><button data-range="1Y">1Y</button><button data-range="ALL">ALL</button></div></div><canvas id="chart"></canvas><div class="note" id="note">Rentang ALL akan menggabungkan data harian, bulanan, dan semesteran; frekuensi pengamatan berbeda.</div></section>
-<section class="panel"><b>10 data harian terakhir</b><table><thead><tr><th>TANGGAL</th><th>HARGA / DL</th></tr></thead><tbody id="rows"></tbody></table><div class="note">Data di halaman ini masih statis. Belum terhubung ke database dan belum diverifikasi secara independen.</div></section>
-<div class="foot">GT Economy Index · Prototipe awal</div>
-</main>
+
+<section class="grid">
+  <div class="card"><div class="label">Harga acuan DL</div><div class="value" id="currentPrice">—</div><div class="foot" id="currentFoot">Data terbaru</div></div>
+  <div class="card"><div class="label">Perubahan harian</div><div class="value" id="dailyChange">—</div><div class="foot" id="dailyFoot">Perbandingan data harian</div></div>
+  <div class="card"><div class="label">Rentang data harian</div><div class="value" id="range30">—</div><div class="foot" id="rangeFoot">Low–high sampel</div></div>
+  <div class="card"><div class="label">Indeks harga</div><div class="value" id="indexValue">—</div><div class="foot" id="indexFoot">Basis titik data pertama = 100</div></div>
+</section>
+
+<section class="main">
+  <div class="panel">
+    <div class="panelhead">
+      <div><h3 class="paneltitle">Price Action · IDR / DL</h3><div class="sub">Harga dari catatan yang dimasukkan · bukan feed real-time</div></div>
+      <div class="ranges" id="rangeButtons">
+        <button class="active" data-range="1M">1M</button>
+        <button data-range="1Y">1Y</button>
+        <button data-range="ALL">ALL</button>
+      </div>
+    </div>
+    <div class="chartstats">
+      <div><span>TERTINGGI TERLIHAT</span><strong id="chartHigh">—</strong></div>
+      <div><span>TERENDAH TERLIHAT</span><strong id="chartLow">—</strong></div>
+      <div><span>RATA-RATA TERLIHAT</span><strong id="chartAvg">—</strong></div>
+    </div>
+    <div class="chartwrap"><canvas id="priceChart"></canvas></div>
+    <div class="legend"><i></i> Harga tercatat · Titik historis mengikuti frekuensi data yang tersedia.</div>
+  </div>
+
+  <div class="panel">
+    <div class="panelhead"><div><h3 class="paneltitle">Market Insights</h3><div class="sub">Ringkasan dari data yang tersedia</div></div></div>
+    <div class="bodypad" id="insights"></div>
+  </div>
+</section>
+
+<section class="panel section">
+  <div class="panelhead">
+    <div><h3 class="paneltitle">Historical Price Records</h3><div class="sub">Riwayat harga dan catatan sumber data</div></div>
+    <div class="toolbar">
+      <input class="field search" id="searchInput" placeholder="Cari tanggal atau sumber...">
+      <select class="field" id="typeFilter">
+        <option value="all">Semua jenis data</option>
+        <option value="daily">Harian</option>
+        <option value="monthly">Bulanan</option>
+        <option value="historical">Historis</option>
+        <option value="manual">Input manual</option>
+      </select>
+    </div>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Tanggal / Periode</th><th>Jenis</th><th>Harga / DL</th><th>Perubahan</th><th>Sumber / Aksi</th></tr></thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+  </div>
+  <div class="tablefoot"><span id="rowCount">—</span><span>Harga ditampilkan dalam Rupiah (IDR).</span></div>
+</section>
+
+<div class="note"><strong>Catatan metodologi:</strong> Data ini merupakan catatan harga yang dimasukkan ke indeks, bukan harga resmi atau harga pasar real-time. Sampel historis tidak selalu harian; periode dengan jarak data berbeda tidak boleh dianggap sebagai rangkaian harian lengkap. Data belum diverifikasi secara independen. Input manual tersimpan di browser yang digunakan, bukan database cloud.</div>
+
+<footer><span>GT ECONOMY INDEX · COMMUNITY DATA PROJECT</span><span>Unofficial Growtopia price monitor · Not affiliated with Ubisoft</span></footer>
+</div>
+
+<div class="backdrop" id="modalBackdrop">
+  <div class="modal">
+    <div class="modalhead"><h3>Tambah Catatan Harga</h3><button class="btn" id="closeModal">✕</button></div>
+    <form id="dataForm">
+      <div class="formgrid">
+        <div class="formitem"><label for="entryDate">Tanggal</label><input class="field" type="date" id="entryDate" required></div>
+        <div class="formitem"><label for="entryPrice">Harga per DL (IDR)</label><input class="field" type="number" id="entryPrice" min="1" step="1" placeholder="845" required></div>
+        <div class="formitem"><label for="entryType">Jenis data</label><select class="field" id="entryType"><option value="daily">Harian</option><option value="monthly">Bulanan</option><option value="historical">Historis</option><option value="manual">Input manual</option></select></div>
+        <div class="formitem"><label for="entrySource">Sumber / catatan</label><input class="field" id="entrySource" placeholder="Catatan harga"></div>
+      </div>
+      <div class="help">Tanggal dan jenis data yang sama akan diperbarui jika sudah ada. Data disimpan secara lokal di browser ini.</div>
+      <div class="modalactions"><button type="button" class="btn" id="cancelModal">Batal</button><button type="submit" class="btn primary">Simpan Data</button></div>
+    </form>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
 <script>
-const daily=[[1,500],[2,700],[3,845],[4,790],[5,790],[6,785],[7,780],[8,820],[9,850],[10,820],[11,850],[12,860],[13,810],[14,790],[15,825],[16,815],[17,820],[18,825],[19,805],[20,805],[21,835],[22,850],[23,870],[24,850],[25,845]].map(([d,p])=>({date:new Date(Date.UTC(2026,9,d)),p,kind:"Harian"}));
-const hist=[["2016-06",240000],["2016-12",210000],["2017-06",150000],["2017-12",100000],["2018-06",65000],["2018-12",50000],["2019-06",45000],["2019-12",35000],["2020-06",30000],["2020-12",20000],["2021-06",21000],["2021-12",12000],["2022-06",25000],["2022-12",4500],["2023-06",3450],["2023-12",3550],["2024-06",3600],["2024-12",3600],["2025-06",2500],["2025-12",300],["2026-01",300],["2026-02",300],["2026-03",250],["2026-04",150],["2026-05",315],["2026-06",330],["2026-07",420],["2026-08",440],["2026-09",460]].map(([s,p])=>({date:new Date(s+"-15T00:00:00Z"),p,kind:"Historis"}));
-const all=[...hist,...daily].sort((a,b)=>a.date-b.date), fmt=n=>"Rp"+Math.round(n).toLocaleString("id-ID"), date=d=>new Intl.DateTimeFormat("id-ID",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"}).format(d);
-daily.slice(-10).reverse().forEach(d=>{document.getElementById("rows").insertAdjacentHTML("beforeend",`<tr><td>${date(d.date)}</td><td><b>${fmt(d.p)}</b></td></tr>`)});
-let range="1M";
-function draw(){const c=document.getElementById("chart"),r=c.getBoundingClientRect(),ratio=devicePixelRatio||1;c.width=r.width*ratio;c.height=r.height*ratio;const x=c.getContext("2d");x.scale(ratio,ratio);const w=r.width,h=r.height,pad={l:62,r:10,t:12,b:15};let data=range==="1M"?daily:range==="1Y"?all.filter(a=>a.date>=new Date("2025-10-01T00:00:00Z")):all;let vals=data.map(a=>a.p),mn=Math.min(...vals),mx=Math.max(...vals);if(mn===mx){mn*=.9;mx*=1.1}let extra=(mx-mn)*.1;mn=Math.max(0,mn-extra);mx+=extra;const xx=i=>pad.l+(w-pad.l-pad.r)*i/Math.max(1,data.length-1),yy=v=>pad.t+(h-pad.t-pad.b)*(1-(v-mn)/(mx-mn));x.font="11px system-ui";for(let j=0;j<5;j++){let v=mn+(mx-mn)*j/4,Y=yy(v);x.strokeStyle="#263548";x.beginPath();x.moveTo(pad.l,Y);x.lineTo(w-pad.r,Y);x.stroke();x.fillStyle="#94a6ba";x.fillText(Math.round(v).toLocaleString("id-ID"),3,Y+4)}x.beginPath();data.forEach((d,i)=>i?x.lineTo(xx(i),yy(d.p)):x.moveTo(xx(i),yy(d.p)));x.strokeStyle="#39d9a1";x.lineWidth=2.5;x.stroke();document.getElementById("description").textContent=range==="1M"?"Harga harian · Oktober 2026":range==="1Y"?"Data sejak Oktober 2025":"Seluruh data historis";document.getElementById("note").textContent=range==="ALL"?"Rentang ALL menggabungkan data harian, bulanan, dan semesteran; frekuensi pengamatan berbeda.":"Harga harian hanya tersedia untuk Oktober 2026; periode lain memakai titik historis yang tersedia."}
-document.querySelectorAll("[data-range]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-range]").forEach(z=>z.classList.remove("active"));b.classList.add("active");range=b.dataset.range;draw()});window.onresize=draw;draw();
-</script></body></html>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const rupiah=n=>"Rp"+Math.round(n).toLocaleString("id-ID");
+const fmt=n=>Number(n).toLocaleString("id-ID",{maximumFractionDigits:2});
+const pct=(a,b)=>b?((a-b)/b)*100:0;
+const signedPercent=n=>(n>0?"+":"")+fmt(n)+"%";
+const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const typeNames={daily:"Harian",monthly:"Bulanan",historical:"Historis",manual:"Input manual"};
+
+const initialData=[
+{date:"2016-06-01",price:240000,type:"historical",period:"Jun 2016",source:"Catatan historis"},
+{date:"2016-12-01",price:210000,type:"historical",period:"Des 2016",source:"Catatan historis"},
+{date:"2017-06-01",price:150000,type:"historical",period:"Jun 2017",source:"Catatan historis"},
+{date:"2017-12-01",price:100000,type:"historical",period:"Des 2017",source:"Catatan historis"},
+{date:"2018-06-01",price:65000,type:"historical",period:"Jun 2018",source:"Catatan historis"},
+{date:"2018-12-01",price:50000,type:"historical",period:"Des 2018",source:"Catatan historis"},
+{date:"2019-06-01",price:45000,type:"historical",period:"Jun 2019",source:"Catatan historis"},
+{date:"2019-12-01",price:35000,type:"historical",period:"Des 2019",source:"Catatan historis"},
+{date:"2020-06-01",price:30000,type:"historical",period:"Jun 2020",source:"Catatan historis"},
+{date:"2020-12-01",price:20000,type:"historical",period:"Des 2020",source:"Catatan historis"},
+{date:"2021-06-01",price:21000,type:"historical",period:"Jun 2021",source:"Catatan historis"},
+{date:"2021-12-01",price:12000,type:"historical",period:"Des 2021",source:"Catatan historis"},
+{date:"2022-06-01",price:25000,type:"historical",period:"Jun 2022",source:"Catatan historis"},
+{date:"2022-12-01",price:4500,type:"historical",period:"Des 2022",source:"Catatan historis"},
+{date:"2023-06-01",price:3450,type:"historical",period:"Jun 2023",source:"Catatan historis"},
+{date:"2023-12-01",price:3550,type:"historical",period:"Des 2023",source:"Catatan historis"},
+{date:"2024-06-01",price:3600,type:"historical",period:"Jun 2024",source:"Catatan historis"},
+{date:"2024-12-01",price:3600,type:"historical",period:"Des 2024",source:"Catatan historis"},
+{date:"2025-06-01",price:2500,type:"historical",period:"Jun 2025",source:"Catatan historis"},
+{date:"2025-12-01",price:300,type:"historical",period:"Des 2025",source:"Catatan historis"},
+{date:"2026-01-01",price:300,type:"monthly",period:"Jan 2026",source:"Catatan bulanan"},
+{date:"2026-02-01",price:300,type:"monthly",period:"Feb 2026",source:"Catatan bulanan"},
+{date:"2026-03-01",price:250,type:"monthly",period:"Mar 2026",source:"Catatan bulanan"},
+{date:"2026-04-01",price:150,type:"monthly",period:"Apr 2026",source:"Catatan bulanan"},
+{date:"2026-05-01",price:315,type:"monthly",period:"Mei 2026",source:"Catatan bulanan"},
+{date:"2026-06-01",price:330,type:"monthly",period:"Jun 2026",source:"Catatan bulanan"},
+{date:"2026-07-01",price:420,type:"monthly",period:"Jul 2026",source:"Catatan bulanan"},
+{date:"2026-08-01",price:440,type:"monthly",period:"Agu 2026",source:"Catatan bulanan"},
+{date:"2026-09-01",price:460,type:"monthly",period:"Sep 2026",source:"Catatan bulanan"},
+{date:"2026-10-01",price:500,type:"daily",source:"Catatan harian"},
+{date:"2026-10-02",price:700,type:"daily",source:"Catatan harian"},
+{date:"2026-10-03",price:845,type:"daily",source:"Catatan harian"},
+{date:"2026-10-04",price:790,type:"daily",source:"Catatan harian"},
+{date:"2026-10-05",price:790,type:"daily",source:"Catatan harian"},
+{date:"2026-10-06",price:785,type:"daily",source:"Catatan harian"},
+{date:"2026-10-07",price:780,type:"daily",source:"Catatan harian"},
+{date:"2026-10-08",price:820,type:"daily",source:"Catatan harian"},
+{date:"2026-10-09",price:850,type:"daily",source:"Catatan harian"},
+{date:"2026-10-10",price:820,type:"daily",source:"Catatan harian"},
+{date:"2026-10-11",price:850,type:"daily",source:"Catatan harian"},
+{date:"2026-10-12",price:860,type:"daily",source:"Catatan harian"},
+{date:"2026-10-13",price:810,type:"daily",source:"Catatan harian"},
+{date:"2026-10-14",price:790,type:"daily",source:"Catatan harian"},
+{date:"2026-10-15",price:825,type:"daily",source:"Catatan harian"},
+{date:"2026-10-16",price:815,type:"daily",source:"Catatan harian"},
+{date:"2026-10-17",price:820,type:"daily",source:"Catatan harian"},
+{date:"2026-10-18",price:825,type:"daily",source:"Catatan harian"},
+{date:"2026-10-19",price:805,type:"daily",source:"Catatan harian"},
+{date:"2026-10-20",price:805,type:"daily",source:"Catatan harian"},
+{date:"2026-10-21",price:835,type:"daily",source:"Catatan harian"},
+{date:"2026-10-22",price:850,type:"daily",source:"Catatan harian"},
+{date:"2026-10-23",price:870,type:"daily",source:"Catatan harian"},
+{date:"2026-10-24",price:850,type:"daily",source:"Catatan harian"},
+{date:"2026-10-25",price:845,type:"daily",source:"Catatan harian"}
+];
+
+let data=loadData();
+let activeRange="1M";
+
+function loadData(){
+ try{
+  const saved=localStorage.getItem("gt-economy-index-v2");
+  if(saved){
+   const extra=JSON.parse(saved);
+   if(Array.isArray(extra))return mergeData(initialData,extra);
+  }
+ }catch(e){}
+ return initialData.map(x=>({...x}));
+}
+function mergeData(base,extra){
+ const map=new Map();
+ [...base,...extra].forEach(x=>map.set(x.date+"|"+x.type,{...x}));
+ return Array.from(map.values());
+}
+function saveData(){
+ try{
+  const manual=data.filter(x=>x.type==="manual"||x._edited);
+  localStorage.setItem("gt-economy-index-v2",JSON.stringify(manual));
+ }catch(e){notify("Browser tidak dapat menyimpan data.")}
+}
+function sorted(){return [...data].sort((a,b)=>a.date.localeCompare(b.date)||(a.type||"").localeCompare(b.type||""))}
+function dailySorted(){return sorted().filter(x=>x.type==="daily"||x.type==="manual")}
+function dateLabel(x){
+ if(x.period)return x.period;
+ return new Date(x.date+"T12:00:00").toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"});
+}
+function typeLabel(t){return typeNames[t]||t}
+function changeClass(n){return n===null||!Number.isFinite(n)?"":n>0?"green":n<0?"red":"amber"}
+
+function updateMetrics(){
+ const all=sorted(),daily=dailySorted(),latest=all[all.length-1];
+ $("asOf").textContent="DATA TERBARU · "+(latest?dateLabel(latest).toUpperCase():"—");
+ $("currentPrice").textContent=latest?rupiah(latest.price):"—";
+ $("currentFoot").textContent=latest?typeLabel(latest.type)+" · "+(latest.source||"Sumber tidak dicatat"):"Belum ada data";
+ const prev=daily.length>1?daily[daily.length-2]:null,last=daily[daily.length-1];
+ const change=prev&&last?pct(last.price,prev.price):null;
+ $("dailyChange").textContent=last&&prev?signedPercent(change):"—";
+ $("dailyChange").className="value "+changeClass(change);
+ $("dailyFoot").textContent=prev?rupiah(prev.price)+" → "+rupiah(last.price)+" per DL":"Belum cukup data harian";
+ const recent=daily.slice(-30),prices=recent.map(x=>x.price);
+ $("range30").textContent=prices.length?rupiah(Math.min(...prices))+"–"+rupiah(Math.max(...prices)):"—";
+ $("rangeFoot").textContent=prices.length?prices.length+" titik data harian":"Belum ada data harian";
+ const base=all[0],index=latest&&base?latest.price/base.price*100:NaN;
+ $("indexValue").textContent=Number.isFinite(index)?fmt(index):"—";
+ $("indexFoot").textContent=base?"Basis "+dateLabel(base)+" = 100":"Belum ada data";
+}
+
+function getChartData(){
+ const all=sorted();
+ if(activeRange==="ALL")return all;
+ const latest=all.length?new Date(all[all.length-1].date+"T12:00:00"):new Date();
+ const cutoff=new Date(latest);
+ cutoff.setMonth(cutoff.getMonth()-(activeRange==="1M"?1:12));
+ return all.filter(x=>new Date(x.date+"T12:00:00")>=cutoff);
+}
+function drawChart(){
+ const canvas=$("priceChart"),rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+ if(rect.width<=0||rect.height<=0)return;
+ canvas.width=Math.floor(rect.width*dpr);canvas.height=Math.floor(rect.height*dpr);
+ const ctx=canvas.getContext("2d");
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ const w=rect.width,h=rect.height,pad={l:65,r:14,t:18,b:31},cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+ ctx.clearRect(0,0,w,h);
+ const points=getChartData();
+ if(!points.length){ctx.fillStyle="#8796aa";ctx.fillText("Belum ada data",pad.l,h/2);return}
+ let min=Math.min(...points.map(x=>x.price)),max=Math.max(...points.map(x=>x.price));
+ if(min===max){min=Math.max(0,min*.9);max=max*1.1}
+ const extra=(max-min)*.1;min=Math.max(0,min-extra);max+=extra;
+ const x=i=>pad.l+(points.length===1?cw/2:i*cw/(points.length-1));
+ const y=v=>pad.t+(max-v)/(max-min)*ch;
+ ctx.font="10px system-ui";ctx.textAlign="right";ctx.textBaseline="middle";
+ for(let i=0;i<=4;i++){
+  const val=min+(max-min)*i/4,yy=y(val);
+  ctx.strokeStyle="#253141";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();
+  ctx.fillStyle="#8796aa";ctx.fillText(fmt(val),pad.l-9,yy);
+ }
+ const gradient=ctx.createLinearGradient(0,pad.t,0,h-pad.b);
+ gradient.addColorStop(0,"rgba(69,214,160,.22)");gradient.addColorStop(1,"rgba(69,214,160,0)");
+ ctx.beginPath();
+ points.forEach((p,i)=>i?ctx.lineTo(x(i),y(p.price)):ctx.moveTo(x(i),y(p.price)));
+ ctx.lineTo(x(points.length-1),h-pad.b);ctx.lineTo(x(0),h-pad.b);ctx.closePath();ctx.fillStyle=gradient;ctx.fill();
+ ctx.beginPath();
+ points.forEach((p,i)=>i?ctx.lineTo(x(i),y(p.price)):ctx.moveTo(x(i),y(p.price)));
+ ctx.strokeStyle="#45d6a0";ctx.lineWidth=2;ctx.lineJoin="round";ctx.stroke();
+ points.forEach((p,i)=>{
+  if(points.length<35||i===0||i===points.length-1||i%Math.ceil(points.length/12)===0){
+   ctx.beginPath();ctx.arc(x(i),y(p.price),2.8,0,Math.PI*2);ctx.fillStyle="#8bf0c7";ctx.fill();
+  }
+ });
+ const labels=[0,Math.floor((points.length-1)/2),points.length-1].filter((v,i,a)=>a.indexOf(v)===i);
+ ctx.textAlign="center";ctx.textBaseline="top";ctx.fillStyle="#8796aa";
+ labels.forEach(i=>{
+  const p=points[i];
+  const label=p.period||new Date(p.date+"T12:00:00").toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:activeRange==="ALL"?"2-digit":undefined});
+  ctx.fillText(label,x(i),h-pad.b+9);
+ });
+ $("chartHigh").textContent=rupiah(Math.max(...points.map(p=>p.price)));
+ $("chartLow").textContent=rupiah(Math.min(...points.map(p=>p.price)));
+ $("chartAvg").textContent=rupiah(points.reduce((s,p)=>s+p.price,0)/points.length);
+ canvas.onmousemove=e=>{
+  const r=canvas.getBoundingClientRect(),mx=e.clientX-r.left;
+  const idx=Math.max(0,Math.min(points.length-1,Math.round((mx-pad.l)/Math.max(1,cw)*(points.length-1))));
+  const p=points[idx];canvas.title=dateLabel(p)+" · "+rupiah(p.price)+" · "+typeLabel(p.type);
+ };
+}
+
+function renderInsights(){
+ const all=sorted(),daily=dailySorted(),html=[];
+ if(daily.length>=2){
+  const latest=daily[daily.length-1],prev=daily[daily.length-2];
+  html.push(`<div class="signal"><div class="signalicon">↕</div><div><strong>Pergerakan harian</strong><p>${rupiah(latest.price)} per DL, ${signedPercent(pct(latest.price,prev.price))} dibanding catatan sebelumnya (${rupiah(prev.price)}).</p></div></div>`);
+  const hi=Math.max(...daily.map(x=>x.price)),lo=Math.min(...daily.map(x=>x.price));
+  const highDate=daily.find(x=>x.price===hi),lowDate=daily.find(x=>x.price===lo);
+  html.push(`<div class="signal"><div class="signalicon">⌁</div><div><strong>Rentang sampel harian</strong><p>Terendah ${rupiah(lo)} (${dateLabel(lowDate)}); tertinggi ${rupiah(hi)} (${dateLabel(highDate)}).</p></div></div>`);
+  const start=daily[0];
+  html.push(`<div class="signal"><div class="signalicon">◷</div><div><strong>Perubahan sejak catatan pertama</strong><p>${signedPercent(pct(latest.price,start.price))} dari ${rupiah(start.price)} ke ${rupiah(latest.price)}. Ini perubahan historis, bukan prediksi.</p></div></div>`);
+ }else{
+  html.push(`<div class="signal"><div class="signalicon">i</div><div><strong>Data harian terbatas</strong><p>Tambahkan lebih banyak catatan harian untuk menghitung pergerakan.</p></div></div>`);
+ }
+ const first=all[0],last=all[all.length-1];
+ if(first&&last)html.push(`<div class="signal"><div class="signalicon">▥</div><div><strong>Cakupan data</strong><p>${all.length} titik data dari ${dateLabel(first)} hingga ${dateLabel(last)}. Frekuensi catatan berbeda menurut periode.</p></div></div>`);
+ $("insights").innerHTML=html.join("");
+}
+
+function renderTable(){
+ const q=$("searchInput").value.trim().toLowerCase(),type=$("typeFilter").value;
+ const all=sorted().reverse();
+ const filtered=all.filter(x=>(type==="all"||x.type===type)&&(`${dateLabel(x)} ${x.date} ${x.source||""} ${typeLabel(x.type)}`).toLowerCase().includes(q));
+ $("historyBody").innerHTML=filtered.map(x=>{
+  const older=sorted().filter(z=>z.date<x.date).slice(-1)[0];
+  const change=older?pct(x.price,older.price):null;
+  const del=x.type==="manual"?` <button class="btn" data-delete="${escapeHtml(x.date)}" data-kind="${escapeHtml(x.type)}" style="padding:4px 7px">Hapus</button>`:"";
+  return `<tr><td><strong>${escapeHtml(dateLabel(x))}</strong><div class="foot">${escapeHtml(x.date)}</div></td><td><span class="tag">${escapeHtml(typeLabel(x.type))}</span></td><td><strong>${rupiah(x.price)}</strong></td><td class="${changeClass(change)}">${older?signedPercent(change):"—"}</td><td>${escapeHtml(x.source||"Tidak dicatat")}${del}</td></tr>`;
+ }).join("")||'<tr><td colspan="5" style="text-align:center;padding:25px;color:#8796aa">Tidak ada data yang cocok.</td></tr>';
+ $("rowCount").textContent="Menampilkan "+filtered.length+" dari "+all.length+" titik data";
+ $("historyBody").querySelectorAll("[data-delete]").forEach(btn=>btn.addEventListener("click",()=>{
+  if(confirm("Hapus catatan manual ini?")){
+   data=data.filter(x=>!(x.date===btn.dataset.delete&&x.type===btn.dataset.kind));
+   saveData();renderAll();notify("Catatan dihapus.");
+  }
+ }));
+}
+function renderAll(){updateMetrics();drawChart();renderInsights();renderTable()}
+function notify(message){const t=$("toast");t.textContent=message;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2600)}
+function openModal(){
+ $("modalBackdrop").classList.add("open");
+ $("entryDate").value=new Date().toISOString().slice(0,10);
+ $("entryPrice").value="";
+ $("entrySource").value="";
+ $("entryPrice").focus();
+}
+function closeModal(){$("modalBackdrop").classList.remove("open")}
+
+$("addBtn").addEventListener("click",openModal);
+$("closeModal").addEventListener("click",closeModal);
+$("cancelModal").addEventListener("click",closeModal);
+$("modalBackdrop").addEventListener("click",e=>{if(e.target===$("modalBackdrop"))closeModal()});
+$("dataForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ const date=$("entryDate").value,price=Number($("entryPrice").value),type=$("entryType").value,source=$("entrySource").value.trim()||"Input manual";
+ if(!date||!Number.isFinite(price)||price<=0){notify("Tanggal atau harga tidak valid.");return}
+ data=data.filter(x=>!(x.date===date&&x.type===type));
+ data.push({date,price,type,source});
+ saveData();closeModal();renderAll();notify("Data tersimpan di browser ini.");
+});
+$("rangeButtons").querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>{
+ $("rangeButtons").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b===btn));
+ activeRange=btn.dataset.range;drawChart();
+}));
+$("searchInput").addEventListener("input",renderTable);
+$("typeFilter").addEventListener("change",renderTable);
+$("exportBtn").addEventListener("click",()=>{
+ const rows=[["date","period","price_idr_per_dl","type","source"],...sorted().map(x=>[x.date,x.period||"",x.price,x.type,x.source||""])];
+ const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\r\n");
+ const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download="gt-economy-index-data.csv";document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);notify("CSV berhasil diekspor.");
+});
+window.addEventListener("resize",drawChart);
+renderAll();
+})();
+</script>
+</body>
+</html>
