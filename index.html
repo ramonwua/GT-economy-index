@@ -1,543 +1,808 @@
+
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#090e15">
-<title>GT Economy Index</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080d13">
+<title>LockLedger — Growtopia Economy</title>
 <style>
-:root{--bg:#090e15;--panel:#111925;--line:#253244;--text:#e8eef7;--muted:#8796aa;--green:#45d6a0;--red:#ff7185;--blue:#79a9ff;--amber:#f0c36a}
+:root{
+  --bg:#080d13;--panel:#101821;--panel2:#141f2b;--line:#263544;
+  --text:#edf4fb;--muted:#8da0b3;--green:#4ade80;--red:#fb7185;
+  --blue:#67b7ff;--yellow:#facc15;
+}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at 15% 0%,#172b3c,transparent 36%),var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
 button,input,select{font:inherit}
 button{cursor:pointer}
-.shell{max-width:1400px;margin:auto;padding:24px}
-header{display:flex;justify-content:space-between;align-items:center;gap:14px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+button:focus-visible,input:focus-visible,select:focus-visible{
+  outline:2px solid var(--blue);outline-offset:2px}
+.shell{max-width:1200px;margin:auto;padding:24px 20px 60px}
+.topbar{display:flex;justify-content:space-between;align-items:center;
+  gap:16px;flex-wrap:wrap;padding-bottom:22px;border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:12px}
-.logo{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:#183448;border:1px solid #31536a;color:var(--green);font-weight:900;font-size:18px}
-h1{font-size:17px;margin:0;letter-spacing:.6px}
-.brand p{margin:3px 0 0;color:var(--muted);font-size:10px;letter-spacing:1.5px;text-transform:uppercase}
-.actions,.toolbar,.ranges{display:flex;gap:8px;flex-wrap:wrap}
-.btn{border:1px solid #344459;background:#172231;color:var(--text);border-radius:9px;padding:9px 13px;font-size:12px;font-weight:650}
-.btn:hover{border-color:var(--green)}
-.btn.primary{background:#173b35;border-color:#2b7460;color:#a5f3d6}
-.hero{display:flex;justify-content:space-between;align-items:end;gap:16px;padding:28px 0 20px}
-.eyebrow{font-size:10px;color:var(--muted);letter-spacing:1.8px;text-transform:uppercase;font-weight:750}
-h2{font-size:27px;line-height:1.2;margin:7px 0}
-.hero p{margin:0;color:var(--muted);font-size:13px}
-.datepill{font-size:11px;border:1px solid var(--line);border-radius:9px;padding:9px 12px;color:#b4c1d2}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.card,.panel{background:linear-gradient(145deg,#131d2a,#0f1621);border:1px solid var(--line);border-radius:14px;min-width:0}
-.card{padding:17px}
-.label{color:#9eacbd;font-size:12px}
-.value{font-size:25px;font-weight:780;letter-spacing:-.6px;margin:10px 0 3px;overflow-wrap:anywhere}
-.foot{font-size:11px;color:var(--muted)}
-.green{color:var(--green)!important}.red{color:var(--red)!important}.amber{color:var(--amber)!important}
-.main{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(260px,.8fr);gap:12px;margin-top:12px}
-.panel{overflow:hidden}
-.panelhead{padding:17px 18px 13px;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line)}
-.paneltitle{font-size:14px;font-weight:750;margin:0}
-.sub{font-size:11px;color:var(--muted);margin-top:4px}
-.ranges{gap:3px;padding:3px;border:1px solid var(--line);border-radius:9px;background:#0a1018;flex-wrap:nowrap}
-.ranges button{border:0;border-radius:6px;padding:6px 10px;background:transparent;color:var(--muted);font-size:11px}
-.ranges button.active{background:#2a3b50;color:white}
-.chartstats{display:flex;gap:25px;flex-wrap:wrap;padding:13px 18px 0}
-.chartstats span{font-size:10px;color:var(--muted)}
-.chartstats strong{display:block;font-size:13px;margin-top:3px}
-.chartwrap{height:320px;padding:10px 12px;position:relative;touch-action:pan-y}
-canvas{display:block;width:100%;height:100%;touch-action:pan-y}
-.legend{padding:0 18px 15px;font-size:11px;color:var(--muted)}
-.legend i{display:inline-block;width:18px;height:3px;background:var(--green);vertical-align:middle;margin-right:6px}
-.bodypad{padding:16px}
-.signal{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid var(--line)}
-.signal:last-child{border:0}
-.signalicon{flex-shrink:0;width:32px;height:32px;border-radius:9px;background:#18283a;border:1px solid #30445b;display:grid;place-items:center;color:var(--blue)}
-.signal strong{font-size:12px}
-.signal p{margin:4px 0 0;color:var(--muted);font-size:11px}
-.section{margin-top:12px}
-.field{background:#0b121c;border:1px solid #2b3a4d;border-radius:8px;padding:9px 10px;color:var(--text);min-width:0}
-.search{width:220px}
-.tablewrap{overflow:auto}
-table{width:100%;border-collapse:collapse;white-space:nowrap}
-th,td{text-align:right;padding:12px 16px;border-bottom:1px solid #202c3b;font-size:12px}
-th{background:#0e1621;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.8px}
-th:first-child,td:first-child{text-align:left}
-tbody tr:hover{background:#172332}
-.tag{display:inline-block;border:1px solid #34485f;border-radius:6px;background:#192637;padding:3px 6px;color:#b8cde3;font-size:10px}
-.tablefoot{padding:12px 16px;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.note{margin-top:12px;padding:15px 17px;background:#19170f;border:1px solid #403922;border-radius:12px;color:#c2b99f;font-size:11px}
-.note strong{color:#f0dba1}
-footer{padding:20px 2px 5px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#6e7c90;font-size:11px}
-.backdrop{display:none;position:fixed;inset:0;background:#02060bdd;z-index:5;align-items:center;justify-content:center;padding:16px}
-.backdrop.open{display:flex}
-.modal{width:min(500px,100%);max-height:90vh;overflow:auto;background:#121c29;border:1px solid #34465b;border-radius:15px;padding:20px}
-.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.modalhead h3{margin:0;font-size:17px}
-.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.formitem{display:flex;flex-direction:column;gap:6px}
-.formitem label{font-size:11px;color:#a8b6c8}
-.formitem input,.formitem select{width:100%}
-.help{font-size:11px;color:var(--muted);margin-top:12px}
-.modalactions{display:flex;justify-content:flex-end;gap:8px;margin-top:17px}
-.toast{position:fixed;bottom:20px;right:20px;z-index:8;background:#18352e;border:1px solid #39715f;border-radius:9px;padding:12px 16px;display:none;color:#baf4df;font-size:12px;max-width:calc(100% - 40px)}
-.toast.show{display:block}
-.charttip{position:absolute;display:none;z-index:2;pointer-events:none;background:#101a27;border:1px solid #3b536d;border-radius:8px;padding:9px 12px;box-shadow:0 8px 25px #0007;font-size:11px;min-width:140px}
-.charttip strong{display:block;color:var(--green);font-size:14px;margin-top:3px}
-.charttip span{color:#a8b6c8}
-.historygroup{padding:14px 16px 7px;background:#101925;border-bottom:1px solid var(--line);font-size:11px;font-weight:750;color:#9db0c7;letter-spacing:1px;text-transform:uppercase}
-@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.main{grid-template-columns:1fr}}
-@media(max-width:560px){.shell{padding:13px}header{align-items:flex-start}.actions{flex-direction:column}.actions .btn{padding:8px}.hero{align-items:flex-start;flex-direction:column;padding-top:22px}h2{font-size:23px}.card{padding:13px}.value{font-size:21px}.panelhead{align-items:flex-start;flex-direction:column}.chartwrap{height:265px}.search{width:100%}.formgrid{grid-template-columns:1fr}th,td{padding:11px 12px}}
+.logo{width:42px;height:42px;display:grid;place-items:center;
+  background:#173b2a;border:1px solid #2b714a;border-radius:12px;
+  color:var(--green);font-size:20px;font-weight:900}
+.brand h1{font-size:20px;letter-spacing:-.6px;margin:0}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+.top-actions,.nav,.range,.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn,.navbtn,.range button{background:var(--panel2);border:1px solid var(--line);
+  color:var(--text);border-radius:9px;padding:9px 13px}
+.btn:hover,.navbtn:hover,.range button:hover{border-color:#5c7891}
+.btn.primary{background:var(--green);color:#06120a;border-color:var(--green);font-weight:750}
+.btn.danger{color:var(--red)}
+.btn.small{padding:6px 9px;font-size:12px}
+.nav{margin:22px 0}
+.navbtn{background:transparent;color:var(--muted)}
+.navbtn.active,.range button.active{background:#1b3041;color:var(--text);border-color:#3c688a}
+.page{display:none;animation:fadein .25s ease}
+.page.active{display:block}
+@keyframes fadein{from{opacity:.3;transform:translateY(5px)}to{opacity:1;transform:none}}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;margin:26px 0 16px}
+.section-head h2{margin:0;font-size:23px;letter-spacing:-.6px}
+.section-head p{margin:4px 0 0;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
+.stat-label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.8px}
+.stat-value{font-size:clamp(19px,2.4vw,28px);font-weight:780;letter-spacing:-.7px;
+  margin:8px 0 5px;overflow-wrap:anywhere}
+.stat-foot{font-size:12px;color:var(--muted)}
+.positive{color:var(--green)!important}.negative{color:var(--red)!important}
+.neutral{color:var(--muted)!important}
+.chart-card{margin-top:16px}
+.chart-head{display:flex;align-items:flex-start;justify-content:space-between;
+  gap:12px;flex-wrap:wrap}
+.chart-head h3,.card h3{margin:0 0 4px;font-size:15px}
+.chart-head p{margin:0;color:var(--muted);font-size:12px}
+.range button{padding:7px 12px;font-size:12px}
+.chart-wrap{height:340px;position:relative;margin-top:16px}
+canvas{width:100%;height:100%;display:block}
+.chart-tooltip{position:absolute;pointer-events:none;display:none;z-index:2;
+  background:#192634;border:1px solid #3a5064;padding:10px 12px;border-radius:9px;
+  box-shadow:0 8px 25px #0006;font-size:12px;min-width:130px}
+.chart-tooltip strong{display:block;font-size:15px;margin-top:3px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:10px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.two-col{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:16px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+.field{margin-bottom:14px}
+input,select{width:100%;padding:11px 12px;background:#0a1119;border:1px solid var(--line);
+  border-radius:9px;color:var(--text);min-width:0}
+input::placeholder{color:#62778a}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.note{font-size:12px;color:var(--muted);line-height:1.65}
+.status{padding:12px;border:1px solid var(--line);border-radius:10px;
+  color:var(--muted);font-size:12px;margin-top:12px}
+.table-wrap{overflow:auto;margin-top:14px}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th,td{text-align:left;padding:13px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:650}
+td{font-size:13px}
+tbody tr:hover{background:#ffffff05}
+.pill{display:inline-flex;border-radius:20px;padding:4px 8px;font-size:11px;font-weight:700}
+.pill.add{background:#123526;color:var(--green)}
+.pill.remove{background:#3a1c26;color:var(--red)}
+.pill.market{background:#172d41;color:var(--blue)}
+.empty{text-align:center;color:var(--muted);padding:30px!important}
+hr{border:0;border-top:1px solid var(--line);margin:20px 0}
+.footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:11px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .two-col{grid-template-columns:1fr}.shell{padding:17px 13px 40px}}
+@media(max-width:480px){.grid{gap:9px}.card{padding:13px}.stat-value{font-size:20px}
+  .chart-wrap{height:280px}.brand h1{font-size:17px}.form-row{grid-template-columns:1fr}
+  .section-head h2{font-size:21px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;
+  transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
 <div class="shell">
-<header>
-  <div class="brand">
-    <div class="logo">GT<span style="font-size:10px">/</span></div>
-    <div><h1>GT ECONOMY INDEX</h1><p>Growtopia Market Monitor</p></div>
-  </div>
-  <div class="actions">
-    <button class="btn" id="exportBtn">↓ Export CSV</button>
-    <button class="btn primary" id="addBtn">＋ Tambah Data</button>
-  </div>
-</header>
-
-<section class="hero">
-  <div>
-    <div class="eyebrow">Market Overview / Indonesia</div>
-    <h2>Digital Economy, Measured.</h2>
-    <p>Pemantauan harga komunitas Growtopia dalam Rupiah.</p>
-  </div>
-  <div class="datepill" id="asOf">DATA TERBARU · —</div>
-</section>
-
-<section class="grid">
-  <div class="card"><div class="label">Harga acuan DL</div><div class="value" id="currentPrice">—</div><div class="foot" id="currentFoot">Data terbaru</div></div>
-  <div class="card"><div class="label">Perubahan harian</div><div class="value" id="dailyChange">—</div><div class="foot" id="dailyFoot">Perbandingan catatan harian</div></div>
-  <div class="card"><div class="label">Rentang harga harian</div><div class="value" id="range30">—</div><div class="foot" id="rangeFoot">Sampel harian tersedia</div></div>
-  <div class="card"><div class="label">Indeks harga</div><div class="value" id="indexValue">—</div><div class="foot" id="indexFoot">Basis titik data pertama = 100</div></div>
-</section>
-
-<section class="main">
-  <div class="panel">
-    <div class="panelhead">
-      <div><h3 class="paneltitle">Price Action · IDR / DL</h3><div class="sub" id="chartSubtitle">Pergerakan harga berdasarkan catatan yang tersedia</div></div>
-      <div class="ranges" id="rangeButtons">
-        <button class="active" data-range="1M">1M</button>
-        <button data-range="1Y">1Y</button>
-        <button data-range="ALL">ALL</button>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">L</div>
+      <div>
+        <h1>LockLedger</h1>
+        <p>GROWTOPIA ECONOMY &amp; ASSET TRACKER</p>
       </div>
     </div>
-    <div class="chartstats">
-      <div><span>TERTINGGI</span><strong id="chartHigh">—</strong></div>
-      <div><span>TERENDAH</span><strong id="chartLow">—</strong></div>
-      <div><span>RATA-RATA</span><strong id="chartAvg">—</strong></div>
-    </div>
-    <div class="chartwrap" id="chartWrap">
-      <canvas id="priceChart" aria-label="Grafik harga DL interaktif"></canvas>
-      <div class="charttip" id="chartTip"></div>
-    </div>
-    <div class="legend"><i></i> Harga tercatat · Sentuh titik atau arahkan kursor untuk melihat detail.</div>
-  </div>
-
-  <div class="panel">
-    <div class="panelhead"><div><h3 class="paneltitle">Market Insights</h3><div class="sub">Ringkasan dari catatan yang tersedia</div></div></div>
-    <div class="bodypad" id="insights"></div>
-  </div>
-</section>
-
-<section class="panel section">
-  <div class="panelhead">
-    <div><h3 class="paneltitle">Historical Price Records</h3><div class="sub">Riwayat dipisahkan menurut jenis data</div></div>
-    <div class="toolbar">
-      <input class="field search" id="searchInput" placeholder="Cari tanggal atau sumber...">
-      <select class="field" id="typeFilter">
-        <option value="all">Semua jenis data</option>
-        <option value="daily">Harian</option>
-        <option value="monthly">Bulanan</option>
-        <option value="historical">Historis</option>
-        <option value="manual">Input manual</option>
+    <div class="top-actions">
+      <select id="currencySelect" aria-label="Display currency" style="width:auto">
+        <option value="IDR">IDR · Rupiah</option>
+        <option value="USD">USD · US Dollar</option>
       </select>
+      <button class="btn" id="exportBtn">Export CSV</button>
     </div>
-  </div>
-  <div id="historyContainer"></div>
-  <div class="tablefoot"><span id="rowCount">—</span><span>Semua harga dalam Rupiah (IDR).</span></div>
-</section>
+  </header>
 
-<div class="note"><strong>Metodologi:</strong> Data berasal dari catatan harga yang dimasukkan ke indeks, bukan harga resmi atau feed real-time. Grafik 1M menggunakan data harian bulan berjalan; 1Y menggunakan data bulanan tahun berjalan; ALL merangkum data historis per semester. Bulan atau semester tanpa data yang sesuai akan dibiarkan kosong. Data belum diverifikasi secara independen. Input manual tersimpan di browser ini, belum ke database cloud.</div>
+  <nav class="nav" aria-label="Main navigation">
+    <button class="navbtn active" data-page="market">Market Overview</button>
+    <button class="navbtn" data-page="portfolio">My Portfolio</button>
+    <button class="navbtn" data-page="transactions">Transaction History</button>
+    <button class="navbtn" data-page="settings">Settings</button>
+  </nav>
 
-<footer><span>GT ECONOMY INDEX · COMMUNITY DATA PROJECT</span><span>Unofficial Growtopia price monitor · Not affiliated with Ubisoft</span></footer>
-</div>
-
-<div class="backdrop" id="modalBackdrop">
-  <div class="modal">
-    <div class="modalhead"><h3>Tambah Catatan Harga</h3><button class="btn" id="closeModal">✕</button></div>
-    <form id="dataForm">
-      <div class="formgrid">
-        <div class="formitem"><label for="entryDate">Tanggal</label><input class="field" type="date" id="entryDate" required></div>
-        <div class="formitem"><label for="entryPrice">Harga per DL (IDR)</label><input class="field" type="number" id="entryPrice" min="1" step="1" placeholder="845" required></div>
-        <div class="formitem"><label for="entryType">Jenis data</label><select class="field" id="entryType"><option value="daily">Harian</option><option value="monthly">Bulanan</option><option value="historical">Historis / semester</option><option value="manual">Input manual</option></select></div>
-        <div class="formitem"><label for="entrySource">Sumber / catatan</label><input class="field" id="entrySource" placeholder="Catatan harga"></div>
+  <main>
+    <section class="page active" id="page-market">
+      <div class="section-head">
+        <div><h2>Market Overview</h2><p>Diamond Lock price history and market movement.</p></div>
+        <span class="note" id="marketUpdated">Historical dataset · User-provided records</span>
       </div>
-      <div class="help">Tanggal dan jenis data yang sama akan diperbarui. Data tersimpan lokal di browser ini.</div>
-      <div class="modalactions"><button type="button" class="btn" id="cancelModal">Batal</button><button type="submit" class="btn primary">Simpan Data</button></div>
-    </form>
-  </div>
+      <div class="grid">
+        <div class="card">
+          <div class="stat-label">Latest DL Price</div>
+          <div class="stat-value" id="latestPrice">—</div>
+          <div class="stat-foot" id="latestDate">Latest recorded price</div>
+        </div>
+        <div class="card">
+          <div class="stat-label">Previous Record</div>
+          <div class="stat-value" id="previousPrice">—</div>
+          <div class="stat-foot" id="priceChange">Price movement</div>
+        </div>
+        <div class="card">
+          <div class="stat-label">Your DL Balance</div>
+          <div class="stat-value" id="marketBalance">0 DL</div>
+          <div class="stat-foot">Tracked personal holdings</div>
+        </div>
+        <div class="card">
+          <div class="stat-label">Portfolio Value</div>
+          <div class="stat-value" id="marketValue">—</div>
+          <div class="stat-foot">Balance × latest DL price</div>
+        </div>
+      </div>
+
+      <div class="card chart-card">
+        <div class="chart-head">
+          <div><h3>Diamond Lock Price Index</h3><p id="chartSubtitle">Historical market prices</p></div>
+          <div class="range" role="group" aria-label="Chart range">
+            <button data-range="1M" class="active">1M</button>
+            <button data-range="1Y">1Y</button>
+            <button data-range="ALL">ALL</button>
+          </div>
+        </div>
+        <div class="chart-wrap" id="chartWrap">
+          <canvas id="priceChart" aria-label="Diamond Lock price chart"></canvas>
+          <div class="chart-tooltip" id="chartTooltip"></div>
+        </div>
+        <div class="legend"><span><i class="dot" style="background:var(--green)"></i>DL price</span>
+          <span><i class="dot" style="background:var(--blue)"></i>Recorded data</span></div>
+        <p class="note">Historical figures are records entered for this project, not independently verified market prices. Missing dates are not treated as zero.</p>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <h3>Recent Price Records</h3>
+          <p class="note">Latest available market observations.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Date</th><th>Price / DL</th><th>Record Type</th></tr></thead>
+            <tbody id="recentPrices"></tbody>
+          </table></div>
+        </div>
+        <div class="card">
+          <h3>How to read the index</h3>
+          <p class="note">The chart uses your saved price history. The 1M view shows daily records, 1Y shows monthly observations, and ALL groups historical observations by semester.</p>
+          <hr>
+          <p class="note"><strong>Portfolio value</strong> is the current DL balance multiplied by the latest available price.</p>
+          <p class="note"><strong>Market performance</strong> estimates how the value of your opening balance changed due to price movement, excluding the effect of deposits and withdrawals.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-portfolio">
+      <div class="section-head">
+        <div><h2>My Portfolio</h2><p>Track your Diamond Lock holdings and valuation.</p></div>
+      </div>
+      <div class="grid">
+        <div class="card"><div class="stat-label">DL Balance</div><div class="stat-value" id="portfolioBalance">0 DL</div><div class="stat-foot">Current recorded holdings</div></div>
+        <div class="card"><div class="stat-label">Current Asset Value</div><div class="stat-value" id="portfolioValue">—</div><div class="stat-foot">Using the latest DL price</div></div>
+        <div class="card"><div class="stat-label">Market P/L</div><div class="stat-value" id="marketPL">—</div><div class="stat-foot">Price effect on opening holdings</div></div>
+        <div class="card"><div class="stat-label">Market Return</div><div class="stat-value" id="marketReturn">—</div><div class="stat-foot">Price effect ÷ opening value</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Record a DL Transaction</h3>
+          <p class="note">Each transaction saves the market price and USD exchange rate at the time of entry.</p>
+          <form id="transactionForm">
+            <div class="field"><label for="txType">Transaction Type</label>
+              <select id="txType"><option value="add">Add DL</option><option value="remove">Remove DL</option></select></div>
+            <div class="field"><label for="txAmount">Amount (DL)</label>
+              <input id="txAmount" type="number" min="0.000001" step="any" placeholder="e.g. 250" required></div>
+            <div class="field"><label for="txPrice">DL Price at Transaction (IDR / DL)</label>
+              <input id="txPrice" type="number" min="0.000001" step="any" required></div>
+            <div class="field"><label for="txDate">Transaction Date &amp; Time</label>
+              <input id="txDate" type="datetime-local" required></div>
+            <div class="field"><label for="txNote">Note (optional)</label>
+              <input id="txNote" maxlength="120" placeholder="Purchase, sale, transfer, etc."></div>
+            <button class="btn primary" type="submit" style="width:100%">Save Transaction</button>
+          </form>
+          <div class="status" id="txStatus">No transaction submitted yet.</div>
+        </div>
+        <div class="card">
+          <h3>Performance Breakdown</h3>
+          <p class="note">The figures below distinguish changes in market price from changes in holdings.</p>
+          <hr>
+          <div class="stat-label">Market Price Effect</div>
+          <div class="stat-value" id="detailMarketPL">—</div>
+          <p class="note">Current price minus the opening reference price, multiplied by your opening DL balance. This is a simplified estimate.</p>
+          <hr>
+          <div class="stat-label">Net DL Added / Removed</div>
+          <div class="stat-value" id="netDL">0 DL</div>
+          <p class="note">Total additions minus total removals, based on recorded transactions.</p>
+          <hr>
+          <div class="stat-label">Recorded Cost of Net Transactions</div>
+          <div class="stat-value" id="netCost">—</div>
+          <p class="note">Additions count as positive and removals as negative using each transaction's saved price. This is not a tax or accounting statement.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-transactions">
+      <div class="section-head">
+        <div><h2>Transaction History</h2><p>Every entry retains its original price and exchange-rate snapshot.</p></div>
+        <button class="btn" id="exportTxBtn">Export Transactions</button>
+      </div>
+      <div class="grid">
+        <div class="card"><div class="stat-label">Total Added</div><div class="stat-value" id="totalAdded">0 DL</div></div>
+        <div class="card"><div class="stat-label">Total Removed</div><div class="stat-value" id="totalRemoved">0 DL</div></div>
+        <div class="card"><div class="stat-label">Transaction Count</div><div class="stat-value" id="txCount">0</div></div>
+        <div class="card"><div class="stat-label">Net Flow</div><div class="stat-value" id="netFlow">0 DL</div></div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="chart-head"><div><h3>All Transactions</h3><p class="note">Sorted newest first.</p></div>
+          <select id="txFilter" style="width:auto"><option value="all">All transactions</option><option value="add">Additions only</option><option value="remove">Removals only</option></select>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Date &amp; Time</th><th>Type</th><th>Amount</th><th>Price / DL</th><th>FX snapshot</th><th>Value at entry</th><th>Note</th><th>Action</th></tr></thead>
+          <tbody id="txTable"></tbody>
+        </table></div>
+        <p class="note">Deleting a transaction recalculates the current balance from the remaining transaction ledger.</p>
+      </div>
+    </section>
+
+    <section class="page" id="page-settings">
+      <div class="section-head"><div><h2>Settings</h2><p>Manage conversion, records, and local data.</p></div></div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Currency &amp; Exchange Rate</h3>
+          <p class="note">USD values use the manually maintained IDR/USD rate below. Existing transaction snapshots are never rewritten when you update the rate.</p>
+          <form id="settingsForm" style="margin-top:18px">
+            <div class="field"><label for="fxRate">IDR per 1 USD</label>
+              <input id="fxRate" type="number" min="1" step="any" required></div>
+            <button class="btn primary" type="submit">Save Exchange Rate</button>
+          </form>
+          <div class="status" id="fxStatus"></div>
+          <hr>
+          <h3>How conversion works</h3>
+          <p class="note">Current USD asset value = current IDR asset value ÷ current exchange rate. Each transaction stores the exchange rate in effect when it was recorded, so past entries remain auditable.</p>
+        </div>
+        <div class="card">
+          <h3>Data Management</h3>
+          <p class="note">Your records are saved in this browser. Clearing browser storage or switching devices may remove access to this data.</p>
+          <div class="actions" style="margin-top:18px">
+            <button class="btn" id="exportAllBtn">Export All Data (JSON)</button>
+            <button class="btn" id="importBtn">Import JSON Backup</button>
+            <input id="importFile" type="file" accept=".json,application/json" hidden>
+          </div>
+          <hr>
+          <h3>Reset Local Data</h3>
+          <p class="note">This removes the saved transactions and settings for this prototype. Historical seed records remain in the source code.</p>
+          <button class="btn danger" id="resetBtn">Reset Portfolio Data</button>
+          <div class="status" id="dataStatus">Local-only prototype. No account or cloud sync.</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h3>Price Data Management</h3>
+        <p class="note">Add a new market price record to the historical index. The record is saved locally and can be exported as a backup.</p>
+        <form id="priceForm" style="margin-top:16px">
+          <div class="form-row">
+            <div class="field"><label for="priceDate">Date</label><input id="priceDate" type="date" required></div>
+            <div class="field"><label for="priceValue">Price (IDR / DL)</label><input id="priceValue" type="number" min="0.000001" step="any" required></div>
+          </div>
+          <div class="field"><label for="priceType">Record Type</label><select id="priceType"><option value="daily">Daily</option><option value="monthly">Monthly</option><option value="historical">Historical</option><option value="manual">Manual</option></select></div>
+          <button class="btn primary" type="submit">Add Price Record</button>
+        </form>
+        <p class="note">For dates with existing records, the newest entry is used for that date. The transaction ledger stores its own price snapshot and will not change if a market record is edited or added.</p>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"><span>LOCKLEDGER · GROWTOPIA ECONOMY TRACKER</span><span>Local prototype · Not affiliated with Growtopia</span></footer>
 </div>
-<div class="toast" id="toast"></div>
 
 <script>
-(function(){
-"use strict";
-const $=id=>document.getElementById(id);
-const rupiah=n=>"Rp"+Math.round(n).toLocaleString("id-ID");
-const fmt=n=>Number(n).toLocaleString("id-ID",{maximumFractionDigits:2});
-const pct=(a,b)=>b?((a-b)/b)*100:0;
-const signedPercent=n=>(n>0?"+":"")+fmt(n)+"%";
-const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const typeNames={daily:"Harian",monthly:"Bulanan",historical:"Historis",manual:"Input manual"};
-const monthNames=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+(() => {
+'use strict';
 
-const initialData=[
-{date:"2016-06-01",price:240000,type:"historical",period:"Jun 2016",source:"Catatan historis"},
-{date:"2016-12-01",price:210000,type:"historical",period:"Des 2016",source:"Catatan historis"},
-{date:"2017-06-01",price:150000,type:"historical",period:"Jun 2017",source:"Catatan historis"},
-{date:"2017-12-01",price:100000,type:"historical",period:"Des 2017",source:"Catatan historis"},
-{date:"2018-06-01",price:65000,type:"historical",period:"Jun 2018",source:"Catatan historis"},
-{date:"2018-12-01",price:50000,type:"historical",period:"Des 2018",source:"Catatan historis"},
-{date:"2019-06-01",price:45000,type:"historical",period:"Jun 2019",source:"Catatan historis"},
-{date:"2019-12-01",price:35000,type:"historical",period:"Des 2019",source:"Catatan historis"},
-{date:"2020-06-01",price:30000,type:"historical",period:"Jun 2020",source:"Catatan historis"},
-{date:"2020-12-01",price:20000,type:"historical",period:"Des 2020",source:"Catatan historis"},
-{date:"2021-06-01",price:21000,type:"historical",period:"Jun 2021",source:"Catatan historis"},
-{date:"2021-12-01",price:12000,type:"historical",period:"Des 2021",source:"Catatan historis"},
-{date:"2022-06-01",price:25000,type:"historical",period:"Jun 2022",source:"Catatan historis"},
-{date:"2022-12-01",price:4500,type:"historical",period:"Des 2022",source:"Catatan historis"},
-{date:"2023-06-01",price:3450,type:"historical",period:"Jun 2023",source:"Catatan historis"},
-{date:"2023-12-01",price:3550,type:"historical",period:"Des 2023",source:"Catatan historis"},
-{date:"2024-06-01",price:3600,type:"historical",period:"Jun 2024",source:"Catatan historis"},
-{date:"2024-12-01",price:3600,type:"historical",period:"Des 2024",source:"Catatan historis"},
-{date:"2025-06-01",price:2500,type:"historical",period:"Jun 2025",source:"Catatan historis"},
-{date:"2025-12-01",price:300,type:"historical",period:"Des 2025",source:"Catatan historis"},
-{date:"2026-01-01",price:300,type:"monthly",period:"Jan 2026",source:"Catatan bulanan"},
-{date:"2026-02-01",price:300,type:"monthly",period:"Feb 2026",source:"Catatan bulanan"},
-{date:"2026-03-01",price:250,type:"monthly",period:"Mar 2026",source:"Catatan bulanan"},
-{date:"2026-04-01",price:150,type:"monthly",period:"Apr 2026",source:"Catatan bulanan"},
-{date:"2026-05-01",price:315,type:"monthly",period:"Mei 2026",source:"Catatan bulanan"},
-{date:"2026-06-01",price:330,type:"monthly",period:"Jun 2026",source:"Catatan bulanan"},
-{date:"2026-07-01",price:420,type:"monthly",period:"Jul 2026",source:"Catatan bulanan"},
-{date:"2026-08-01",price:440,type:"monthly",period:"Agu 2026",source:"Catatan bulanan"},
-{date:"2026-09-01",price:460,type:"monthly",period:"Sep 2026",source:"Catatan bulanan"},
-{date:"2026-10-01",price:500,type:"daily",source:"Catatan harian"},
-{date:"2026-10-02",price:700,type:"daily",source:"Catatan harian"},
-{date:"2026-10-03",price:845,type:"daily",source:"Catatan harian"},
-{date:"2026-10-04",price:790,type:"daily",source:"Catatan harian"},
-{date:"2026-10-05",price:790,type:"daily",source:"Catatan harian"},
-{date:"2026-10-06",price:785,type:"daily",source:"Catatan harian"},
-{date:"2026-10-07",price:780,type:"daily",source:"Catatan harian"},
-{date:"2026-10-08",price:820,type:"daily",source:"Catatan harian"},
-{date:"2026-10-09",price:850,type:"daily",source:"Catatan harian"},
-{date:"2026-10-10",price:820,type:"daily",source:"Catatan harian"},
-{date:"2026-10-11",price:850,type:"daily",source:"Catatan harian"},
-{date:"2026-10-12",price:860,type:"daily",source:"Catatan harian"},
-{date:"2026-10-13",price:810,type:"daily",source:"Catatan harian"},
-{date:"2026-10-14",price:790,type:"daily",source:"Catatan harian"},
-{date:"2026-10-15",price:825,type:"daily",source:"Catatan harian"},
-{date:"2026-10-16",price:815,type:"daily",source:"Catatan harian"},
-{date:"2026-10-17",price:820,type:"daily",source:"Catatan harian"},
-{date:"2026-10-18",price:825,type:"daily",source:"Catatan harian"},
-{date:"2026-10-19",price:805,type:"daily",source:"Catatan harian"},
-{date:"2026-10-20",price:805,type:"daily",source:"Catatan harian"},
-{date:"2026-10-21",price:835,type:"daily",source:"Catatan harian"},
-{date:"2026-10-22",price:850,type:"daily",source:"Catatan harian"},
-{date:"2026-10-23",price:870,type:"daily",source:"Catatan harian"},
-{date:"2026-10-24",price:850,type:"daily",source:"Catatan harian"},
-{date:"2026-10-25",price:845,type:"daily",source:"Catatan harian"}
-];
+const STORAGE_KEY = 'gt-economy-index-v3';
+const LEGACY_KEY = 'gt-economy-index-v2';
+const $ = id => document.getElementById(id);
+const today = () => new Date().toISOString().slice(0,10);
+const nowLocalInput = () => {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0,16);
+};
+const number = n => Number.isFinite(Number(n)) ? Number(n) : 0;
+const escapeHTML = s => String(s ?? '').replace(/[&<>"']/g, c => ({
+  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+}[c]));
 
-function loadData(){
+const historical = [
+ ['2016-06-30',240000,'historical'],['2016-12-31',210000,'historical'],
+ ['2017-06-30',150000,'historical'],['2017-12-31',100000,'historical'],
+ ['2018-06-30',65000,'historical'],['2018-12-31',50000,'historical'],
+ ['2019-06-30',45000,'historical'],['2019-12-31',35000,'historical'],
+ ['2020-06-30',30000,'historical'],['2020-12-31',20000,'historical'],
+ ['2021-06-30',21000,'historical'],['2021-12-31',12000,'historical'],
+ ['2022-06-30',25000,'historical'],['2022-12-31',4500,'historical'],
+ ['2023-06-30',3450,'historical'],['2023-12-31',3550,'historical'],
+ ['2024-06-30',3600,'historical'],['2024-12-31',3600,'historical'],
+ ['2025-06-30',2500,'historical'],['2025-12-31',300,'historical']
+].map(([date,price,type]) => ({date,price,type,source:'seed'}));
+
+const monthly = [
+ ['2026-01-31',300],['2026-02-28',300],['2026-03-31',250],
+ ['2026-04-30',150],['2026-05-31',315],['2026-06-30',330],
+ ['2026-07-31',420],['2026-08-31',440],['2026-09-30',460]
+].map(([date,price]) => ({date,price,type:'monthly',source:'seed'}));
+
+const dailyPrices = [
+ 500,700,845,790,790,785,780,820,850,820,850,860,810,
+ 790,825,815,820,825,805,805,835,850,870,850,845
+].map((price,i) => ({
+ date:`2026-10-${String(i+1).padStart(2,'0')}`,
+ price,type:'daily',source:'seed'
+}));
+
+function makeInitialState(){
+ return {version:3,currency:'IDR',fxRate:16000,transactions:[],manualPrices:[],openingBalance:0};
+}
+function readState(){
+ const fresh = makeInitialState();
  try{
-  const saved=JSON.parse(localStorage.getItem("gt-economy-index-v2")||"[]");
-  if(Array.isArray(saved)){
-   const map=new Map(initialData.map(x=>[x.date+"|"+x.type,{...x}]));
-   saved.forEach(x=>{if(x&&x.date&&x.type&&Number(x.price)>0)map.set(x.date+"|"+x.type,{...x})});
-   return [...map.values()];
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(raw){
+   const saved = JSON.parse(raw);
+   return {...fresh,...saved,
+    transactions:Array.isArray(saved.transactions)?saved.transactions:[],
+    manualPrices:Array.isArray(saved.manualPrices)?saved.manualPrices:[]};
   }
- }catch(e){}
- return initialData.map(x=>({...x}));
+ }catch(e){console.warn('Could not read saved data',e)}
+ // Migrate portfolio data only; seed price history remains in code.
+ try{
+  const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY)||'null');
+  if(legacy && Array.isArray(legacy.manualPrices)) fresh.manualPrices=legacy.manualPrices;
+  if(legacy && Array.isArray(legacy.prices)){
+   fresh.manualPrices=legacy.prices.filter(p=>p && p.date && Number(p.price)>0)
+    .map(p=>({date:p.date,price:Number(p.price),type:p.type||'manual',source:'migrated'}));
+  }
+ }catch(e){console.warn('Legacy migration skipped',e)}
+ return fresh;
 }
-let data=loadData(),activeRange="1M",chartPoints=[],chartGeometry=null;
-function sorted(){return [...data].sort((a,b)=>a.date.localeCompare(b.date))}
-function dateLabel(x){return x.period||new Date(x.date+"T12:00:00").toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"})}
-function typeLabel(t){return typeNames[t]||t}
-function changeClass(n){return !Number.isFinite(n)?"":n>0?"green":n<0?"red":"amber"}
-function saveData(){
- try{localStorage.setItem("gt-economy-index-v2",JSON.stringify(data.filter(x=>x.type==="manual"||x._edited)))}catch(e){notify("Browser tidak dapat menyimpan data.")}
-}
-function todayParts(){const d=new Date();return {year:d.getFullYear(),month:d.getMonth()}}
-function parseDate(s){const a=s.split("-").map(Number);return {year:a[0],month:a[1]-1,day:a[2]}}
-function formatDay(d){return String(d).padStart(2,"0")}
-function dayLabel(x){const p=parseDate(x.date);return formatDay(p.day)+" "+monthNames[p.month]+" "+p.year}
+let state = readState();
+let chartRange = '1M';
+let animationFrame = 0;
+let chartPoints = [];
+let hoverIndex = -1;
 
-function monthlyPoints(){
- const now=todayParts(),year=now.year,result=[];
- for(let m=0;m<12;m++){
-  const records=sorted().filter(x=>{
-   const p=parseDate(x.date);
-   return p.year===year&&p.month===m&&x.type==="monthly";
+function saveState(){
+ try{
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+  $('dataStatus').textContent='Saved locally in this browser.';
+ }catch(e){
+  $('dataStatus').textContent='Could not save data. Browser storage may be full or unavailable.';
+  console.error(e);
+ }
+}
+function allPrices(){
+ const map = new Map();
+ [...historical,...monthly,...dailyPrices,...state.manualPrices].forEach(p=>{
+  if(p && p.date && number(p.price)>0){
+   const old=map.get(p.date);
+   if(!old || p.source!=='seed') map.set(p.date,{...p,price:number(p.price)});
+  }
+ });
+ return [...map.values()].sort((a,b)=>a.date.localeCompare(b.date));
+}
+function latestPriceRecord(){
+ const a=allPrices(); return a[a.length-1]||{date:today(),price:0,type:'none'};
+}
+function currentPrice(){return number(latestPriceRecord().price)}
+function fmtMoney(idr, currency=state.currency){
+ const v=currency==='USD'?number(idr)/Math.max(1,number(state.fxRate)):number(idr);
+ try{
+  return new Intl.NumberFormat(currency==='USD'?'en-US':'id-ID',{
+   style:'currency',currency,maximumFractionDigits:currency==='IDR'?0:2
+  }).format(v);
+ }catch{return (currency==='USD'?'$':'Rp')+Math.round(v).toLocaleString()}
+}
+function fmtNumber(v, digits=4){
+ return new Intl.NumberFormat('en-US',{maximumFractionDigits:digits}).format(number(v));
+}
+function fmtDate(s){
+ const d=new Date(`${s}T00:00:00`);
+ return Number.isNaN(d.getTime())?s:d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+function fmtDateTime(s){
+ const d=new Date(s);
+ return Number.isNaN(d.getTime())?s:d.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+function transactionBalance(){
+ return number(state.openingBalance)+state.transactions.reduce((sum,t)=>
+  sum+(t.type==='add'?number(t.amount):-number(t.amount)),0);
+}
+function totals(){
+ const added=state.transactions.filter(t=>t.type==='add').reduce((s,t)=>s+number(t.amount),0);
+ const removed=state.transactions.filter(t=>t.type==='remove').reduce((s,t)=>s+number(t.amount),0);
+ const netCost=state.transactions.reduce((s,t)=>s+(t.type==='add'?1:-1)*number(t.amount)*number(t.priceIdr),0);
+ return {added,removed,net:added-removed,netCost};
+}
+function baseline(){
+ const first=state.transactions.slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)))[0];
+ return first ? number(first.priceIdr) : currentPrice();
+}
+function marketEffect(){
+ const bal=transactionBalance();
+ const first=baseline();
+ // Price effect on today's holdings is deliberately not called realized profit.
+ return {effect:bal*(currentPrice()-first),baseValue:bal*first,returnPct:first>0?(currentPrice()-first)/first*100:0};
+}
+function setSigned(el,value,formatter=fmtMoney){
+ el.textContent=(value>0?'+':'')+formatter(value);
+ el.classList.toggle('positive',value>0);
+ el.classList.toggle('negative',value<0);
+}
+function renderSummary(){
+ const latest=latestPriceRecord();
+ const prices=allPrices();
+ const prev=prices.length>1?prices[prices.length-2]:latest;
+ const balance=transactionBalance();
+ const value=balance*currentPrice();
+ $('latestPrice').textContent=fmtMoney(latest.price);
+ $('latestDate').textContent=`Last record: ${fmtDate(latest.date)}`;
+ $('previousPrice').textContent=fmtMoney(prev.price);
+ const delta=latest.price-prev.price;
+ const pct=prev.price?delta/prev.price*100:0;
+ $('priceChange').textContent=`${delta>0?'+':''}${pct.toFixed(2)}% vs previous record`;
+ $('priceChange').className='stat-foot '+(delta>0?'positive':delta<0?'negative':'neutral');
+ $('marketBalance').textContent=fmtNumber(balance)+' DL';
+ $('marketValue').textContent=fmtMoney(value);
+ $('portfolioBalance').textContent=fmtNumber(balance)+' DL';
+ $('portfolioValue').textContent=fmtMoney(value);
+ const perf=marketEffect();
+ setSigned($('marketPL'),perf.effect);
+ setSigned($('detailMarketPL'),perf.effect);
+ $('marketReturn').textContent=`${perf.returnPct>=0?'+':''}${perf.returnPct.toFixed(2)}%`;
+ $('marketReturn').className='stat-value '+(perf.returnPct>0?'positive':perf.returnPct<0?'negative':'neutral');
+ $('netDL').textContent=(totals().net>0?'+':'')+fmtNumber(totals().net)+' DL';
+ $('netCost').textContent=fmtMoney(totals().netCost);
+ renderRecentPrices();
+}
+function renderRecentPrices(){
+ const rows=allPrices().slice(-8).reverse();
+ $('recentPrices').innerHTML=rows.map(p=>`<tr>
+  <td>${escapeHTML(fmtDate(p.date))}</td><td>${escapeHTML(fmtMoney(p.price))}</td>
+  <td><span class="pill market">${escapeHTML(p.type||'manual')}</span></td></tr>`).join('');
+}
+function chartData(range){
+ const prices=allPrices();
+ if(range==='1M'){
+  const currentMonth=today().slice(0,7);
+  const chosen=prices.filter(p=>p.date.slice(0,7)===currentMonth);
+  const days=new Date(Number(currentMonth.slice(0,4)),Number(currentMonth.slice(5,7)),0).getDate();
+  return Array.from({length:days},(_,i)=>{
+   const day=String(i+1).padStart(2,'0');
+   const date=`${currentMonth}-${day}`;
+   const p=chosen.find(x=>x.date===date);
+   return {label:String(i+1),date,value:p?p.price:null};
   });
-  let record=records.length?records[records.length-1]:null;
-  // Jika catatan bulanan Oktober belum ada, gunakan rata-rata catatan harian Oktober.
-  if(!record&&m===now.month){
-   const daily=sorted().filter(x=>{
-    const p=parseDate(x.date);
-    return p.year===year&&p.month===m&&(x.type==="daily"||x.type==="manual");
-   });
-   if(daily.length){
-    record={date:year+"-"+String(m+1).padStart(2,"0")+"-01",price:daily.reduce((s,x)=>s+x.price,0)/daily.length,type:"monthly",period:monthNames[m]+" "+year,source:"Rata-rata catatan harian",derived:true};
+ }
+ if(range==='1Y'){
+  const year=String(new Date().getFullYear());
+  const arr=[];
+  for(let m=1;m<=12;m++){
+   const month=`${year}-${String(m).padStart(2,'0')}`;
+   const monthRows=prices.filter(p=>p.date.slice(0,7)===month);
+   let value=null;
+   const monthlyRow=monthRows.filter(p=>p.type==='monthly'||p.type==='historical').at(-1);
+   if(monthlyRow)value=monthlyRow.price;
+   else if(monthRows.length){
+    const daily=monthRows.filter(p=>p.type==='daily'||p.type==='manual');
+    if(daily.length)value=daily.reduce((s,p)=>s+p.price,0)/daily.length;
+    else value=monthRows[monthRows.length-1].price;
+   }
+   arr.push({label:new Date(Number(year),m-1,1).toLocaleDateString('en-US',{month:'short'}),date:month,value});
+  }
+  return arr;
+ }
+ const byYear=new Map();
+ prices.forEach(p=>{
+  const year=p.date.slice(0,4);
+  if(!byYear.has(year))byYear.set(year,{s1:[],s2:[]});
+  const month=Number(p.date.slice(5,7));
+  byYear.get(year)[month<=6?'s1':'s2'].push(p.price);
+ });
+ const out=[];
+ for(const [year,halves] of byYear){
+  for(const [key,label] of [['s1','H1'],['s2','H2']]){
+   if(halves[key].length){
+    out.push({label:`${label} ${year}`,date:`${year}-${key}`,value:
+      halves[key].reduce((s,v)=>s+v,0)/halves[key].length});
    }
   }
-  result.push({x:m,label:monthNames[m],price:record?record.price:null,record:record||null,type:"monthly"});
  }
- return result;
+ return out;
 }
-function dailyPoints(){
- const now=todayParts(),year=now.year,month=now.month;
- const count=new Date(year,month+1,0).getDate(),result=[];
- for(let d=1;d<=count;d++){
-  const date=year+"-"+String(month+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
-  const matches=sorted().filter(x=>x.date===date&&(x.type==="daily"||x.type==="manual"));
-  const record=matches.length?matches[matches.length-1]:null;
-  result.push({x:d-1,label:String(d),price:record?record.price:null,record,type:"daily"});
- }
- return result;
-}
-function semesterPoints(){
- const years=[...new Set(sorted().map(x=>parseDate(x.date).year))].sort((a,b)=>a-b),result=[];
- years.forEach(year=>{
-  for(let half=0;half<2;half++){
-   const startMonth=half===0?0:6,endMonth=half===0?5:11;
-   const samples=sorted().filter(x=>{
-    const p=parseDate(x.date);
-    return p.year===year&&p.month>=startMonth&&p.month<=endMonth&&
-      (x.type==="monthly"||x.type==="historical");
-   });
-   // Satu nilai per semester: rata-rata catatan bulanan/historis yang tersedia.
-   // Data harian tidak ikut dihitung agar tidak mendominasi sampel.
-   const value=samples.length?samples.reduce((s,x)=>s+x.price,0)/samples.length:null;
-   const record=value===null?null:{
-    date:year+"-"+(half===0?"01":"07")+"-01",
-    price:value,type:"historical",
-    period:(half===0?"S1":"S2")+" "+year,
-    source:"Rata-rata sampel semester ("+samples.length+" catatan)"
-   };
-   result.push({x:result.length,label:(half===0?"S1 ":"S2 ")+year,price:value,record,type:"historical"});
-  }
- });
- return result;
-}
-function getChartPoints(){
- if(activeRange==="1M")return dailyPoints();
- if(activeRange==="1Y")return monthlyPoints();
- return semesterPoints();
-}
-function updateMetrics(){
- const all=sorted(),latest=all[all.length-1];
- const now=todayParts();
- $("asOf").textContent="DATA TERBARU · "+(latest?dateLabel(latest).toUpperCase():"—");
- $("currentPrice").textContent=latest?rupiah(latest.price):"—";
- $("currentFoot").textContent=latest?typeLabel(latest.type)+" · "+(latest.source||"Sumber tidak dicatat"):"Belum ada data";
- const daily=all.filter(x=>x.type==="daily").sort((a,b)=>a.date.localeCompare(b.date));
- const currentMonth=daily.filter(x=>{const p=parseDate(x.date);return p.year===now.year&&p.month===now.month});
- const prev=currentMonth.length>1?currentMonth[currentMonth.length-2]:null;
- const last=currentMonth[currentMonth.length-1];
- const change=prev&&last?pct(last.price,prev.price):null;
- $("dailyChange").textContent=prev&&last?signedPercent(change):"—";
- $("dailyChange").className="value "+changeClass(change);
- $("dailyFoot").textContent=prev?rupiah(prev.price)+" → "+rupiah(last.price):"Butuh minimal dua catatan harian bulan ini";
- const prices=currentMonth.map(x=>x.price);
- $("range30").textContent=prices.length?rupiah(Math.min(...prices))+"–"+rupiah(Math.max(...prices)):"—";
- $("rangeFoot").textContent=prices.length?prices.length+" catatan harian bulan ini":"Belum ada catatan bulan ini";
- const base=all[0],index=latest&&base?latest.price/base.price*100:NaN;
- $("indexValue").textContent=Number.isFinite(index)?fmt(index):"—";
- $("indexFoot").textContent=base?"Basis "+dateLabel(base)+" = 100":"Belum ada data";
-}
-function drawChart(){
- const canvas=$("priceChart"),rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
- if(rect.width<=0||rect.height<=0)return;
- canvas.width=Math.round(rect.width*dpr);canvas.height=Math.round(rect.height*dpr);
- const ctx=canvas.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
- const w=rect.width,h=rect.height,pad={l:62,r:15,t:20,b:32},cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
- ctx.clearRect(0,0,w,h);
- const points=getChartPoints();chartPoints=points;
- $("chartSubtitle").textContent=activeRange==="1M"?"Harian · "+monthNames[todayParts().month]+" "+todayParts().year:activeRange==="1Y"?"Bulanan · Tahun "+todayParts().year:"Historis · Ringkasan per semester";
- const valid=points.filter(p=>p.price!==null&&Number.isFinite(p.price));
+function drawChart(animate=true){
+ const canvas=$('priceChart'),ctx=canvas.getContext('2d');
+ const rect=canvas.getBoundingClientRect();
+ const dpr=Math.min(window.devicePixelRatio||1,2);
+ const W=Math.max(300,rect.width),H=Math.max(220,rect.height);
+ canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ const data=chartData(chartRange);
+ chartPoints=data;
+ const valid=data.map((p,i)=>({...p,i})).filter(p=>p.value!==null&&Number.isFinite(p.value));
+ ctx.clearRect(0,0,W,H);
+ const css=getComputedStyle(document.documentElement);
+ const muted=css.getPropertyValue('--muted').trim();
+ const green=css.getPropertyValue('--green').trim();
+ const line=css.getPropertyValue('--line').trim();
+ const pad={l:64,r:16,t:20,b:38};
+ const pw=W-pad.l-pad.r,ph=H-pad.t-pad.b;
  if(!valid.length){
-  ctx.fillStyle="#8796aa";ctx.textAlign="center";ctx.fillText("Belum ada data pada periode ini",w/2,h/2);
-  $("chartHigh").textContent="—";$("chartLow").textContent="—";$("chartAvg").textContent="—";chartGeometry=null;
-  $("chartTip").style.display="none";return;
+  ctx.fillStyle=muted;ctx.font='13px system-ui';ctx.textAlign='center';
+  ctx.fillText('No price records for this period yet.',W/2,H/2);
+  $('chartSubtitle').textContent=chartRange==='1M'?'Daily prices · Current month':
+   chartRange==='1Y'?'Monthly prices · Current year':'Historical prices · Semester averages';
+  return;
  }
- let min=Math.min(...valid.map(p=>p.price)),max=Math.max(...valid.map(p=>p.price));
- if(min===max){min=Math.max(0,min*.9);max=max*1.1}
- const extra=(max-min)*.12;min=Math.max(0,min-extra);max+=extra;
- const x=i=>pad.l+(points.length===1?cw/2:i*cw/Math.max(1,points.length-1));
- const y=v=>pad.t+(max-v)/(max-min)*ch;
- ctx.font="10px system-ui";ctx.textAlign="right";ctx.textBaseline="middle";
- for(let i=0;i<=4;i++){
-  const val=min+(max-min)*i/4,yy=y(val);
-  ctx.strokeStyle="#253141";ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();
-  ctx.fillStyle="#8796aa";ctx.fillText(fmt(val),pad.l-8,yy);
+ const vals=valid.map(p=>p.value);
+ let min=Math.min(...vals),max=Math.max(...vals);
+ if(min===max){min*=.9;max*=1.1}
+ const logScale=max/min>20 && min>0;
+ const transform=v=>logScale?Math.log(v):v;
+ let lo=transform(min),hi=transform(max);
+ const yMin=lo-(hi-lo)*.08,yMax=hi+(hi-lo)*.08;
+ const x=i=>pad.l+(data.length<=1?pw/2:(i/(data.length-1))*pw);
+ const y=v=>pad.t+ph-(transform(v)-yMin)/(yMax-yMin)*ph;
+
+ ctx.font='11px system-ui';ctx.textAlign='right';ctx.textBaseline='middle';
+ for(let j=0;j<5;j++){
+  const v=yMin+(yMax-yMin)*j/4;
+  const yy=pad.t+ph-j*ph/4;
+  ctx.strokeStyle=line;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(W-pad.r,yy);ctx.stroke();
+  ctx.fillStyle=muted;
+  const shown=logScale?Math.exp(v):v;
+  ctx.fillText(compactPrice(shown),pad.l-9,yy);
  }
- // Sambungkan titik yang berurutan hanya jika keduanya memiliki data.
- let segment=[];
- function strokeSegment(seg,fill){
-  if(!seg.length)return;
-  ctx.beginPath();seg.forEach((p,j)=>j?ctx.lineTo(x(p.i),y(p.p.price)):ctx.moveTo(x(p.i),y(p.p.price)));
-  if(fill&&seg.length>1){
-   ctx.lineTo(x(seg[seg.length-1].i),h-pad.b);ctx.lineTo(x(seg[0].i),h-pad.b);ctx.closePath();
-   const g=ctx.createLinearGradient(0,pad.t,0,h-pad.b);g.addColorStop(0,"rgba(69,214,160,.2)");g.addColorStop(1,"rgba(69,214,160,0)");ctx.fillStyle=g;ctx.fill();
-  }else{ctx.strokeStyle="#45d6a0";ctx.lineWidth=2;ctx.lineJoin="round";ctx.stroke()}
+ ctx.textAlign='center';ctx.textBaseline='top';
+ const ticks=Math.min(6,data.length);
+ for(let j=0;j<ticks;j++){
+  const idx=Math.round(j*(data.length-1)/Math.max(1,ticks-1));
+  ctx.fillStyle=muted;ctx.fillText(data[idx].label,x(idx),H-pad.b+12);
  }
- points.forEach((p,i)=>{
-  if(p.price!==null&&Number.isFinite(p.price))segment.push({p,i});
-  else{strokeSegment(segment,false);segment=[]}
- });
- strokeSegment(segment,true);
- segment=[];
- points.forEach((p,i)=>{
-  if(p.price!==null&&Number.isFinite(p.price))segment.push({p,i});
-  else{strokeSegment(segment,false);segment=[]}
- });
- strokeSegment(segment,false);
- points.forEach((p,i)=>{
-  if(p.price===null||!Number.isFinite(p.price))return;
-  ctx.beginPath();ctx.arc(x(i),y(p.price),activeRange==="1M"?3.5:4,0,Math.PI*2);
-  ctx.fillStyle="#8bf0c7";ctx.fill();
- });
- // Label sumbu X: hari untuk 1M, bulan untuk 1Y, semester untuk ALL.
- ctx.textAlign="center";ctx.textBaseline="top";ctx.fillStyle="#8796aa";
- let labels=[];
- if(activeRange==="1M"){
-  labels=[0,4,9,14,19,24,points.length-1].filter((v,i,a)=>v>=0&&v<points.length&&a.indexOf(v)===i);
- }else if(activeRange==="1Y"){
-  labels=[0,2,4,6,8,10].filter(v=>v<points.length);
- }else{
-  const step=Math.max(1,Math.ceil(points.length/8));
-  labels=points.map((p,i)=>i).filter(i=>i%step===0||i===points.length-1);
+ const points=valid.map(p=>({x:x(p.i),y:y(p.value),...p}));
+ const progress=animate&&!matchMedia('(prefers-reduced-motion: reduce)').matches?0:1;
+ if(progress===0){
+  cancelAnimationFrame(animationFrame);
+  const start=performance.now(),duration=460;
+  const render=t=>{
+   const k=Math.min(1,(t-start)/duration);
+   const eased=1-Math.pow(1-k,3);
+   paintLine(ctx,points,pad,ph,green,eased);
+   if(k<1)animationFrame=requestAnimationFrame(render);
+  };
+  animationFrame=requestAnimationFrame(render);
+ }else paintLine(ctx,points,pad,ph,green,1);
+ $('chartSubtitle').textContent=(chartRange==='1M'?'Daily prices · Current month':
+   chartRange==='1Y'?'Monthly observations · Current year':'Historical observations · Semester averages')
+   +(logScale?' · Log scale':'');
+}
+function compactPrice(v){
+ if(v>=1000000)return (v/1000000).toFixed(1)+'M';
+ if(v>=1000)return (v/1000).toFixed(v>=10000?0:1)+'K';
+ return new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(v);
+}
+function paintLine(ctx,points,pad,ph,color,progress){
+ const W=ctx.canvas.width/(Math.min(window.devicePixelRatio||1,2));
+ const dpr=Math.min(window.devicePixelRatio||1,2);
+ const css=getComputedStyle(document.documentElement);
+ ctx.save();ctx.setTransform(dpr,0,0,dpr,0,0);
+ // Clear only the plot area; grid and labels are redrawn below on every frame.
+ ctx.clearRect(pad.l-1,pad.t-1,W-pad.l-pad.r+2,ph+2);
+ // Recreate grid behind the animated series.
+ ctx.strokeStyle=css.getPropertyValue('--line').trim();ctx.lineWidth=1;
+ for(let j=0;j<5;j++){
+  const yy=pad.t+ph-j*ph/4;
+  ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(W-pad.r,yy);ctx.stroke();
  }
- labels.forEach(i=>ctx.fillText(points[i].label,x(i),h-pad.b+9));
- chartGeometry={x,y,pad,cw,ch,w,h};
- $("chartHigh").textContent=rupiah(Math.max(...valid.map(p=>p.price)));
- $("chartLow").textContent=rupiah(Math.min(...valid.map(p=>p.price)));
- $("chartAvg").textContent=rupiah(valid.reduce((s,p)=>s+p.price,0)/valid.length);
+ const count=Math.max(1,Math.ceil(points.length*progress));
+ const shown=points.slice(0,count);
+ if(shown.length){
+  ctx.beginPath();
+  shown.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+  if(progress>=1 && shown.length>1){
+   const last=shown[shown.length-1],first=shown[0];
+   const gradient=ctx.createLinearGradient(0,pad.t,0,pad.t+ph);
+   gradient.addColorStop(0,'rgba(74,222,128,.20)');
+   gradient.addColorStop(1,'rgba(74,222,128,0)');
+   ctx.lineTo(last.x,pad.t+ph);ctx.lineTo(first.x,pad.t+ph);ctx.closePath();
+   ctx.fillStyle=gradient;ctx.fill();
+  }
+  ctx.beginPath();
+  shown.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+  ctx.strokeStyle=color;ctx.lineWidth=2.4;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
+  const last=shown[shown.length-1];
+  ctx.beginPath();ctx.arc(last.x,last.y,4,0,Math.PI*2);
+  ctx.fillStyle=color;ctx.fill();
+ }
+ ctx.restore();
 }
 function showTooltip(event){
- if(!chartGeometry)return;
- const rect=$("priceChart").getBoundingClientRect(),mx=event.clientX-rect.left,my=event.clientY-rect.top;
- const g=chartGeometry;
- const idx=Math.round((mx-g.pad.l)/Math.max(1,g.cw)*Math.max(1,chartPoints.length-1));
- if(idx<0||idx>=chartPoints.length)return hideTooltip();
- let nearest=chartPoints[idx];
- if(nearest.price===null||!Number.isFinite(nearest.price)){
-  let best=null,dist=Infinity;
-  chartPoints.forEach((p,i)=>{
-   if(p.price===null||!Number.isFinite(p.price))return;
-   const d=Math.abs(i-idx);
-   if(d<dist){dist=d;best=p;idx=i}
-  });
-  nearest=best;
- }
- if(!nearest)return hideTooltip();
- const p=nearest.record;
- const title=p?(p.period||dayLabel(p)):nearest.label;
- const tip=$("chartTip");
- tip.innerHTML=escapeHtml(title)+"<strong>"+rupiah(nearest.price)+" / DL</strong><span>"+escapeHtml(p?(p.source||typeLabel(p.type)):typeLabel(nearest.type))+"</span>";
- tip.style.display="block";
- const wrap=$("chartWrap"),left=Math.min(Math.max(8,mx+12),wrap.clientWidth-160),top=Math.min(Math.max(8,my-12),wrap.clientHeight-76);
- tip.style.left=left+"px";tip.style.top=top+"px";
+ if(!chartPoints.length)return;
+ const canvas=$('priceChart'),rect=canvas.getBoundingClientRect();
+ const px=event.clientX-rect.left;
+ const data=chartPoints;
+ const idx=Math.max(0,Math.min(data.length-1,Math.round(px/rect.width*(data.length-1))));
+ const p=data[idx];
+ if(!p||p.value===null){$('chartTooltip').style.display='none';return}
+ const tip=$('chartTooltip');
+ tip.style.display='block';
+ tip.innerHTML=`<span>${escapeHTML(p.date||p.label)}</span><strong>${escapeHTML(fmtMoney(p.value))}</strong>`;
+ const left=Math.max(4,Math.min(rect.width-150,px+12));
+ tip.style.left=left+'px';tip.style.top='24px';
 }
-function hideTooltip(){$("chartTip").style.display="none"}
-$("priceChart").addEventListener("mousemove",showTooltip);
-$("priceChart").addEventListener("mouseleave",hideTooltip);
-$("priceChart").addEventListener("click",showTooltip);
-$("priceChart").addEventListener("touchstart",e=>{
- const t=e.touches[0];if(t)showTooltip({clientX:t.clientX,clientY:t.clientY});
-},{passive:true});
-function renderInsights(){
- const all=sorted(),daily=all.filter(x=>x.type==="daily").sort((a,b)=>a.date.localeCompare(b.date)),html=[];
- if(daily.length>=2){
-  const last=daily[daily.length-1],prev=daily[daily.length-2];
-  html.push(`<div class="signal"><div class="signalicon">↕</div><div><strong>Pergerakan harian</strong><p>${rupiah(last.price)} per DL, ${signedPercent(pct(last.price,prev.price))} dibanding catatan sebelumnya (${rupiah(prev.price)}).</p></div></div>`);
-  const hi=daily.reduce((a,b)=>a.price>b.price?a:b),lo=daily.reduce((a,b)=>a.price<b.price?a:b);
-  html.push(`<div class="signal"><div class="signalicon">⌁</div><div><strong>Rentang catatan harian</strong><p>Terendah ${rupiah(lo.price)} (${dayLabel(lo)}); tertinggi ${rupiah(hi.price)} (${dayLabel(hi)}).</p></div></div>`);
-  html.push(`<div class="signal"><div class="signalicon">◷</div><div><strong>Perubahan sejak catatan pertama</strong><p>${signedPercent(pct(last.price,daily[0].price))} dari ${rupiah(daily[0].price)} ke ${rupiah(last.price)}. Bukan prediksi.</p></div></div>`);
- }else html.push(`<div class="signal"><div class="signalicon">i</div><div><strong>Data harian terbatas</strong><p>Tambahkan catatan harian untuk melihat pergerakan harian.</p></div></div>`);
- html.push(`<div class="signal"><div class="signalicon">▥</div><div><strong>Cakupan data</strong><p>${all.length} catatan tersedia. Grafik 1M, 1Y, dan ALL menggunakan kelompok data berbeda.</p></div></div>`);
- $("insights").innerHTML=html.join("");
+function hideTooltip(){$('chartTooltip').style.display='none'}
+function renderTransactions(){
+ const tx=state.transactions.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+ const totalsNow=totals();
+ $('totalAdded').textContent=fmtNumber(totalsNow.added)+' DL';
+ $('totalRemoved').textContent=fmtNumber(totalsNow.removed)+' DL';
+ $('txCount').textContent=String(tx.length);
+ $('netFlow').textContent=(totalsNow.net>0?'+':'')+fmtNumber(totalsNow.net)+' DL';
+ $('netFlow').className='stat-value '+(totalsNow.net>0?'positive':totalsNow.net<0?'negative':'');
+ const filter=$('txFilter').value;
+ const shown=tx.filter(t=>filter==='all'||t.type===filter);
+ $('txTable').innerHTML=shown.length?shown.map(t=>{
+  const isAdd=t.type==='add';
+  const value=number(t.amount)*number(t.priceIdr);
+  return `<tr>
+   <td>${escapeHTML(fmtDateTime(t.date))}</td>
+   <td><span class="pill ${isAdd?'add':'remove'}">${isAdd?'ADD':'REMOVE'}</span></td>
+   <td class="${isAdd?'positive':'negative'}">${isAdd?'+':'−'}${escapeHTML(fmtNumber(t.amount))} DL</td>
+   <td>${escapeHTML(fmtMoney(t.priceIdr,'IDR'))}</td>
+   <td>${escapeHTML(fmtNumber(t.fxRate,2))} IDR/USD</td>
+   <td>${escapeHTML(fmtMoney(value,'IDR'))}<br><span class="note">${escapeHTML(fmtMoney(value/Math.max(1,number(t.fxRate)),'USD'))} at entry</span></td>
+   <td>${escapeHTML(t.note||'—')}</td>
+   <td><button class="btn small danger" data-delete="${escapeHTML(t.id)}">Delete</button></td>
+  </tr>`;
+ }).join(''):'<tr><td colspan="8" class="empty">No transactions recorded yet.</td></tr>';
 }
-function renderTable(){
- const q=$("searchInput").value.trim().toLowerCase(),type=$("typeFilter").value;
- const all=sorted().reverse();
- const filtered=all.filter(x=>(type==="all"||x.type===type)&&(`${dateLabel(x)} ${x.date} ${x.source||""} ${typeLabel(x.type)}`).toLowerCase().includes(q));
- const groups=[{key:"daily",label:"CATATAN HARIAN"},{key:"monthly",label:"CATATAN BULANAN"},{key:"historical",label:"RIWAYAT HISTORIS"},{key:"manual",label:"INPUT MANUAL"}];
- let html="";
- groups.forEach(group=>{
-  const rows=filtered.filter(x=>x.type===group.key);
-  if(!rows.length)return;
-  html+=`<div class="historygroup">${group.label} · ${rows.length} catatan</div><div class="tablewrap"><table><thead><tr><th>Tanggal / Periode</th><th>Harga / DL</th><th>Perubahan</th><th>Sumber / Aksi</th></tr></thead><tbody>`;
-  html+=rows.map(x=>{
-   const older=all.find(z=>z.date<x.date);
-   const change=older?pct(x.price,older.price):null;
-   const del=x.type==="manual"?` <button class="btn" data-delete="${escapeHtml(x.date)}" data-kind="${escapeHtml(x.type)}" style="padding:4px 7px">Hapus</button>`:"";
-   return `<tr><td><strong>${escapeHtml(dateLabel(x))}</strong><div class="foot">${escapeHtml(x.date)}</div></td><td><strong>${rupiah(x.price)}</strong></td><td class="${changeClass(change)}">${older?signedPercent(change):"—"}</td><td>${escapeHtml(x.source||"Tidak dicatat")}${del}</td></tr>`;
-  }).join("");
-  html+="</tbody></table></div>";
- });
- $("historyContainer").innerHTML=html||'<div style="padding:25px;text-align:center;color:#8796aa">Tidak ada data yang cocok.</div>';
- $("rowCount").textContent="Menampilkan "+filtered.length+" dari "+all.length+" catatan";
- $("historyContainer").querySelectorAll("[data-delete]").forEach(btn=>btn.addEventListener("click",()=>{
-  if(confirm("Hapus catatan manual ini?")){
-   data=data.filter(x=>!(x.date===btn.dataset.delete&&x.type===btn.dataset.kind));
-   saveData();renderAll();notify("Catatan dihapus.");
-  }
- }));
+function renderAll(){
+ $('currencySelect').value=state.currency;
+ $('fxRate').value=state.fxRate;
+ renderSummary();renderTransactions();drawChart(false);
 }
-function renderAll(){updateMetrics();drawChart();renderInsights();renderTable()}
-function notify(message){const t=$("toast");t.textContent=message;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2600)}
-function openModal(){
- $("modalBackdrop").classList.add("open");
- $("entryDate").value=new Date().toISOString().slice(0,10);
- $("entryPrice").value="";$("entrySource").value="";
- $("entryPrice").focus();
+function setPage(page){
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===`page-${page}`));
+ document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+ if(page==='market')requestAnimationFrame(()=>drawChart(false));
 }
-function closeModal(){$("modalBackdrop").classList.remove("open")}
-$("addBtn").addEventListener("click",openModal);
-$("closeModal").addEventListener("click",closeModal);
-$("cancelModal").addEventListener("click",closeModal);
-$("modalBackdrop").addEventListener("click",e=>{if(e.target===$("modalBackdrop"))closeModal()});
-$("dataForm").addEventListener("submit",e=>{
- e.preventDefault();
- const date=$("entryDate").value,price=Number($("entryPrice").value),type=$("entryType").value,source=$("entrySource").value.trim()||"Input manual";
- if(!date||!Number.isFinite(price)||price<=0){notify("Tanggal atau harga tidak valid.");return}
- data=data.filter(x=>!(x.date===date&&x.type===type));
- data.push({date,price,type,source});
- saveData();closeModal();renderAll();notify("Data tersimpan di browser ini.");
-});
-$("rangeButtons").querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>{
- $("rangeButtons").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b===btn));
- activeRange=btn.dataset.range;hideTooltip();drawChart();
+document.querySelectorAll('.navbtn').forEach(btn=>btn.addEventListener('click',()=>setPage(btn.dataset.page)));
+document.querySelectorAll('[data-range]').forEach(btn=>btn.addEventListener('click',()=>{
+ chartRange=btn.dataset.range;
+ document.querySelectorAll('[data-range]').forEach(b=>b.classList.toggle('active',b===btn));
+ drawChart(true);
 }));
-$("searchInput").addEventListener("input",renderTable);
-$("typeFilter").addEventListener("change",renderTable);
-$("exportBtn").addEventListener("click",()=>{
- const rows=[["date","period","price_idr_per_dl","type","source"],...sorted().map(x=>[x.date,x.period||"",x.price,x.type,x.source||""])];
- const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\r\n");
- const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});
- const url=URL.createObjectURL(blob),a=document.createElement("a");
- a.href=url;a.download="gt-economy-index-data.csv";document.body.appendChild(a);a.click();a.remove();
- setTimeout(()=>URL.revokeObjectURL(url),1000);notify("CSV berhasil diekspor.");
+$('currencySelect').addEventListener('change',()=>{
+ state.currency=$('currencySelect').value;saveState();renderAll();
 });
-window.addEventListener("resize",drawChart);
+$('priceChart').addEventListener('mousemove',showTooltip);
+$('priceChart').addEventListener('mouseleave',hideTooltip);
+$('priceChart').addEventListener('touchstart',e=>{if(e.touches[0])showTooltip(e.touches[0])},{passive:true});
+$('priceChart').addEventListener('touchmove',e=>{if(e.touches[0])showTooltip(e.touches[0])},{passive:true});
+
+$('transactionForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const type=$('txType').value;
+ const amount=number($('txAmount').value);
+ const priceIdr=number($('txPrice').value);
+ const date=$('txDate').value;
+ if(amount<=0||priceIdr<=0||!date){$('txStatus').textContent='Enter a valid amount, price, and date.';return}
+ if(type==='remove'&&amount>transactionBalance()){
+  $('txStatus').textContent=`Insufficient balance. Current balance: ${fmtNumber(transactionBalance())} DL.`;return;
+ }
+ const tx={
+  id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2),
+  type,amount,priceIdr,date,note:$('txNote').value.trim(),
+  fxRate:number(state.fxRate),currencyAtEntry:state.currency,
+  valueIdr:amount*priceIdr,valueUsdAtEntry:amount*priceIdr/Math.max(1,number(state.fxRate)),
+  createdAt:new Date().toISOString()
+ };
+ state.transactions.push(tx);saveState();renderAll();
+ $('txStatus').textContent=`Saved ${type==='add'?'addition':'removal'} of ${fmtNumber(amount)} DL at ${fmtMoney(priceIdr,'IDR')} per DL. FX snapshot: ${fmtNumber(tx.fxRate,2)} IDR/USD.`;
+ $('txAmount').value='';$('txNote').value='';
+ setPage('transactions');
+});
+$('txDate').value=nowLocalInput();
+$('txPrice').value=currentPrice();
+
+$('txFilter').addEventListener('change',renderTransactions);
+$('txTable').addEventListener('click',e=>{
+ const btn=e.target.closest('[data-delete]');if(!btn)return;
+ const tx=state.transactions.find(t=>t.id===btn.dataset.delete);
+ if(!tx)return;
+ if(!confirm('Delete this transaction? The portfolio balance will be recalculated.'))return;
+ state.transactions=state.transactions.filter(t=>t.id!==tx.id);
+ saveState();renderAll();
+});
+$('settingsForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const fx=number($('fxRate').value);
+ if(fx<=0){$('fxStatus').textContent='Enter a valid positive exchange rate.';return}
+ state.fxRate=fx;saveState();renderAll();
+ $('fxStatus').textContent=`Saved: 1 USD = ${fmtNumber(fx,2)} IDR. Historical transaction snapshots remain unchanged.`;
+});
+$('priceForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const date=$('priceDate').value,price=number($('priceValue').value),type=$('priceType').value;
+ if(!date||price<=0)return;
+ state.manualPrices.push({date,price,type,source:'manual',createdAt:new Date().toISOString()});
+ saveState();renderAll();$('txPrice').value=currentPrice();
+ $('dataStatus').textContent=`Saved market record: ${fmtDate(date)} · ${fmtMoney(price,'IDR')} per DL.`;
+ $('priceForm').reset();$('priceDate').value=today();
+});
+function download(filename,content,type='text/plain'){
+ const blob=new Blob([content],{type});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');a.href=url;a.download=filename;a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function csvCell(v){return '"'+String(v??'').replace(/"/g,'""')+'"'}
+function exportTransactions(){
+ const rows=[['id','date','type','amount_dl','price_idr_per_dl','fx_idr_per_usd','value_idr_at_entry','value_usd_at_entry','note']];
+ state.transactions.forEach(t=>rows.push([t.id,t.date,t.type,t.amount,t.priceIdr,t.fxRate,
+  t.valueIdr??t.amount*t.priceIdr,t.valueUsdAtEntry??(t.amount*t.priceIdr/Math.max(1,t.fxRate)),t.note]));
+ download('lockledger-transactions.csv',rows.map(r=>r.map(csvCell).join(',')).join('\n'),'text/csv;charset=utf-8');
+}
+function exportPrices(){
+ const rows=[['date','price_idr_per_dl','type'],...allPrices().map(p=>[p.date,p.price,p.type])];
+ download('lockledger-prices.csv',rows.map(r=>r.map(csvCell).join(',')).join('\n'),'text/csv;charset=utf-8');
+}
+$('exportBtn').addEventListener('click',exportPrices);
+$('exportTxBtn').addEventListener('click',exportTransactions);
+$('exportAllBtn').addEventListener('click',()=>{
+ download('lockledger-backup.json',JSON.stringify({state,prices:allPrices(),exportedAt:new Date().toISOString()},null,2),'application/json');
+});
+$('importBtn').addEventListener('click',()=>$('importFile').click());
+$('importFile').addEventListener('change',async e=>{
+ const file=e.target.files[0];if(!file)return;
+ try{
+  const data=JSON.parse(await file.text());
+  const imported=data.state||data;
+  if(!imported||!Array.isArray(imported.transactions)||!Array.isArray(imported.manualPrices))
+   throw new Error('Invalid backup format');
+  if(!confirm('Import this backup and replace the current local portfolio data?'))return;
+  state={...makeInitialState(),...imported};
+  saveState();renderAll();
+  $('dataStatus').textContent='Backup imported successfully.';
+ }catch(err){alert('Could not import backup: '+err.message)}
+ finally{e.target.value=''}
+});
+$('resetBtn').addEventListener('click',()=>{
+ if(!confirm('Reset local transactions, balance, manual prices, and currency settings? Export a backup first if needed.'))return;
+ state=makeInitialState();saveState();renderAll();
+ $('txStatus').textContent='Portfolio data has been reset.';
+ $('fxStatus').textContent='Default exchange rate restored.';
+});
+$('priceDate').value=today();
+$('fxStatus').textContent=`Current rate: 1 USD = ${fmtNumber(state.fxRate,2)} IDR.`;
+window.addEventListener('resize',()=>drawChart(false));
+
 renderAll();
 })();
 </script>
