@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GT Economy Index</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1017;--panel:#121b27;--line:#263548;--text:#eef4fb;--muted:#94a6ba;--green:#39d9a1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,Arial,sans-serif}
+main{max-width:1100px;margin:auto;padding:28px 18px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{display:flex;align-items:center;gap:12px}.logo{display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#39d9a1,#6ba8ff);color:#07131a;font-weight:900}.muted{color:var(--muted)}.tag{border:1px solid #355345;background:#122a25;color:#8df0c3;padding:5px 9px;border-radius:99px;font-size:12px}
+h1{font-size:18px;letter-spacing:.08em;margin:0}h2{font-size:28px;letter-spacing:-.04em;margin:32px 0 5px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:17px}.label{font-size:12px;color:var(--muted)}.value{font-size:24px;font-weight:750;margin-top:5px}.green{color:var(--green)}.panel{margin-top:14px}.panelhead{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.tabs button{background:#1a2635;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer}.tabs button.active{background:#315143;border-color:#39d9a1}canvas{width:100%;height:280px;display:block;margin-top:16px}table{border-collapse:collapse;width:100%;margin-top:12px;font-size:13px}td,th{text-align:left;padding:9px;border-bottom:1px solid var(--line)}th{font-size:11px;color:var(--muted)}.note{background:#1a2635;border:1px solid var(--line);padding:12px;border-radius:10px;font-size:12px;color:#c4d0dd;margin-top:14px}.foot{text-align:center;font-size:11px;color:var(--muted);margin:25px 0}
+@media(max-width:700px){.cards{grid-template-columns:repeat(2,1fr)}main{padding:18px 12px}.value{font-size:21px}canvas{height:230px}}
+</style>
+</head>
+<body><main>
+<header class="top"><div class="brand"><div class="logo">GT</div><div><h1>GT ECONOMY INDEX</h1><div class="muted" style="font-size:12px">Growtopia price intelligence · IDR / DL</div></div></div><span class="tag">PROTOTYPE</span></header>
+<h2>DL Market Overview</h2><div class="muted">Indeks harga historis berdasarkan data kontributor, bukan harga resmi game.</div>
+<section class="cards">
+<div class="card"><div class="label">Harga terakhir</div><div class="value">Rp845</div><div class="muted" style="font-size:12px">25 Oktober 2026</div></div>
+<div class="card"><div class="label">Perubahan Oktober</div><div class="value green">+69,0%</div><div class="muted" style="font-size:12px">Rp500 → Rp845</div></div>
+<div class="card"><div class="label">Median Oktober</div><div class="value">Rp820</div><div class="muted" style="font-size:12px">25 observasi harian</div></div>
+<div class="card"><div class="label">Tertinggi Oktober</div><div class="value">Rp870</div><div class="muted" style="font-size:12px">23 Oktober 2026</div></div>
+</section>
+<section class="panel"><div class="panelhead"><div><b>Harga DL (IDR)</b><div class="muted" style="font-size:12px" id="description">Harga harian · Oktober 2026</div></div><div class="tabs"><button data-range="1M" class="active">1M</button><button data-range="1Y">1Y</button><button data-range="ALL">ALL</button></div></div><canvas id="chart"></canvas><div class="note" id="note">Rentang ALL akan menggabungkan data harian, bulanan, dan semesteran; frekuensi pengamatan berbeda.</div></section>
+<section class="panel"><b>10 data harian terakhir</b><table><thead><tr><th>TANGGAL</th><th>HARGA / DL</th></tr></thead><tbody id="rows"></tbody></table><div class="note">Data di halaman ini masih statis. Belum terhubung ke database dan belum diverifikasi secara independen.</div></section>
+<div class="foot">GT Economy Index · Prototipe awal</div>
+</main>
+<script>
+const daily=[[1,500],[2,700],[3,845],[4,790],[5,790],[6,785],[7,780],[8,820],[9,850],[10,820],[11,850],[12,860],[13,810],[14,790],[15,825],[16,815],[17,820],[18,825],[19,805],[20,805],[21,835],[22,850],[23,870],[24,850],[25,845]].map(([d,p])=>({date:new Date(Date.UTC(2026,9,d)),p,kind:"Harian"}));
+const hist=[["2016-06",240000],["2016-12",210000],["2017-06",150000],["2017-12",100000],["2018-06",65000],["2018-12",50000],["2019-06",45000],["2019-12",35000],["2020-06",30000],["2020-12",20000],["2021-06",21000],["2021-12",12000],["2022-06",25000],["2022-12",4500],["2023-06",3450],["2023-12",3550],["2024-06",3600],["2024-12",3600],["2025-06",2500],["2025-12",300],["2026-01",300],["2026-02",300],["2026-03",250],["2026-04",150],["2026-05",315],["2026-06",330],["2026-07",420],["2026-08",440],["2026-09",460]].map(([s,p])=>({date:new Date(s+"-15T00:00:00Z"),p,kind:"Historis"}));
+const all=[...hist,...daily].sort((a,b)=>a.date-b.date), fmt=n=>"Rp"+Math.round(n).toLocaleString("id-ID"), date=d=>new Intl.DateTimeFormat("id-ID",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"}).format(d);
+daily.slice(-10).reverse().forEach(d=>{document.getElementById("rows").insertAdjacentHTML("beforeend",`<tr><td>${date(d.date)}</td><td><b>${fmt(d.p)}</b></td></tr>`)});
+let range="1M";
+function draw(){const c=document.getElementById("chart"),r=c.getBoundingClientRect(),ratio=devicePixelRatio||1;c.width=r.width*ratio;c.height=r.height*ratio;const x=c.getContext("2d");x.scale(ratio,ratio);const w=r.width,h=r.height,pad={l:62,r:10,t:12,b:15};let data=range==="1M"?daily:range==="1Y"?all.filter(a=>a.date>=new Date("2025-10-01T00:00:00Z")):all;let vals=data.map(a=>a.p),mn=Math.min(...vals),mx=Math.max(...vals);if(mn===mx){mn*=.9;mx*=1.1}let extra=(mx-mn)*.1;mn=Math.max(0,mn-extra);mx+=extra;const xx=i=>pad.l+(w-pad.l-pad.r)*i/Math.max(1,data.length-1),yy=v=>pad.t+(h-pad.t-pad.b)*(1-(v-mn)/(mx-mn));x.font="11px system-ui";for(let j=0;j<5;j++){let v=mn+(mx-mn)*j/4,Y=yy(v);x.strokeStyle="#263548";x.beginPath();x.moveTo(pad.l,Y);x.lineTo(w-pad.r,Y);x.stroke();x.fillStyle="#94a6ba";x.fillText(Math.round(v).toLocaleString("id-ID"),3,Y+4)}x.beginPath();data.forEach((d,i)=>i?x.lineTo(xx(i),yy(d.p)):x.moveTo(xx(i),yy(d.p)));x.strokeStyle="#39d9a1";x.lineWidth=2.5;x.stroke();document.getElementById("description").textContent=range==="1M"?"Harga harian · Oktober 2026":range==="1Y"?"Data sejak Oktober 2025":"Seluruh data historis";document.getElementById("note").textContent=range==="ALL"?"Rentang ALL menggabungkan data harian, bulanan, dan semesteran; frekuensi pengamatan berbeda.":"Harga harian hanya tersedia untuk Oktober 2026; periode lain memakai titik historis yang tersedia."}
+document.querySelectorAll("[data-range]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-range]").forEach(z=>z.classList.remove("active"));b.classList.add("active");range=b.dataset.range;draw()});window.onresize=draw;draw();
+</script></body></html>
