@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -124,6 +123,7 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
     <button class="navbtn" data-page="portfolio">My Portfolio</button>
     <button class="navbtn" data-page="transactions">Transaction History</button>
     <button class="navbtn" data-page="settings">Settings</button>
+    <button class="navbtn" data-page="account">Account &amp; DL Bank</button>
   </nav>
 
   <main>
@@ -247,564 +247,531 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
       </div>
       <div class="grid">
         <div class="card"><div class="stat-label">Total Added</div><div class="stat-value" id="totalAdded">0 DL</div></div>
-        <div class="card"><div class="stat-label">Total Removed</div><div class="stat-value" id="totalRemoved">0 DL</div></div>
+                <div class="card"><div class="stat-label">Total Removed</div><div class="stat-value" id="totalRemoved">0 DL</div></div>
         <div class="card"><div class="stat-label">Transaction Count</div><div class="stat-value" id="txCount">0</div></div>
-        <div class="card"><div class="stat-label">Net Flow</div><div class="stat-value" id="netFlow">0 DL</div></div>
       </div>
       <div class="card" style="margin-top:16px">
-        <div class="chart-head"><div><h3>All Transactions</h3><p class="note">Sorted newest first.</p></div>
-          <select id="txFilter" style="width:auto"><option value="all">All transactions</option><option value="add">Additions only</option><option value="remove">Removals only</option></select>
-        </div>
         <div class="table-wrap"><table>
-          <thead><tr><th>Date &amp; Time</th><th>Type</th><th>Amount</th><th>Price / DL</th><th>FX snapshot</th><th>Value at entry</th><th>Note</th><th>Action</th></tr></thead>
-          <tbody id="txTable"></tbody>
+          <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Price / DL</th><th>Value</th><th>Note</th><th>Action</th></tr></thead>
+          <tbody id="transactionsTable"></tbody>
         </table></div>
-        <p class="note">Deleting a transaction recalculates the current balance from the remaining transaction ledger.</p>
       </div>
     </section>
 
     <section class="page" id="page-settings">
-      <div class="section-head"><div><h2>Settings</h2><p>Manage conversion, records, and local data.</p></div></div>
+      <div class="section-head"><div><h2>Settings</h2><p>Manage local portfolio data and backups.</p></div></div>
       <div class="two-col">
         <div class="card">
-          <h3>Currency &amp; Exchange Rate</h3>
-          <p class="note">USD values use the manually maintained IDR/USD rate below. Existing transaction snapshots are never rewritten when you update the rate.</p>
-          <form id="settingsForm" style="margin-top:18px">
-            <div class="field"><label for="fxRate">IDR per 1 USD</label>
-              <input id="fxRate" type="number" min="1" step="any" required></div>
+          <h3>Exchange Rate</h3>
+          <p class="note">Used to estimate the USD value of recorded prices.</p>
+          <form id="fxForm">
+            <div class="field"><label for="fxRate">IDR per USD</label><input id="fxRate" type="number" min="1" step="any" required></div>
             <button class="btn primary" type="submit">Save Exchange Rate</button>
           </form>
           <div class="status" id="fxStatus"></div>
           <hr>
-          <h3>How conversion works</h3>
-          <p class="note">Current USD asset value = current IDR asset value ÷ current exchange rate. Each transaction stores the exchange rate in effect when it was recorded, so past entries remain auditable.</p>
+          <h3>Price History</h3>
+          <p class="note">Add a price record to the historical chart. This is an informational index, not an offer or guarantee of a market price.</p>
+          <form id="priceForm">
+            <div class="field"><label for="priceDate">Date</label><input id="priceDate" type="date" required></div>
+            <div class="field"><label for="priceValue">Price (IDR per DL)</label><input id="priceValue" type="number" min="0.000001" step="any" required></div>
+            <button class="btn primary" type="submit">Add Price Record</button>
+          </form>
+          <div class="status" id="priceStatus">No price record submitted.</div>
         </div>
         <div class="card">
-          <h3>Data Management</h3>
-          <p class="note">Your records are saved in this browser. Clearing browser storage or switching devices may remove access to this data.</p>
-          <div class="actions" style="margin-top:18px">
-            <button class="btn" id="exportAllBtn">Export All Data (JSON)</button>
-            <button class="btn" id="importBtn">Import JSON Backup</button>
+          <h3>Backup &amp; Restore</h3>
+          <p class="note">Export a backup regularly. This backup contains local portfolio transactions and manual price records.</p>
+          <div class="actions">
+            <button class="btn" id="exportAllBtn">Export Full Backup</button>
+            <button class="btn" id="importBtn">Import Backup</button>
             <input id="importFile" type="file" accept=".json,application/json" hidden>
           </div>
+          <div class="status" id="dataStatus">Data is stored in this browser unless you export it.</div>
           <hr>
           <h3>Reset Local Data</h3>
-          <p class="note">This removes the saved transactions and settings for this prototype. Historical seed records remain in the source code.</p>
-          <button class="btn danger" id="resetBtn">Reset Portfolio Data</button>
-          <div class="status" id="dataStatus">Local-only prototype. No account or cloud sync.</div>
+          <p class="note">This resets local portfolio records and manual prices. It does not delete your Supabase account or server-side bank ledger.</p>
+          <button class="btn danger" id="resetBtn">Reset Local Portfolio</button>
+          <hr>
+          <h3>Data Disclaimer</h3>
+          <p class="note">Historical prices may be incomplete or unverified. Portfolio calculations are estimates and are not financial advice.</p>
         </div>
       </div>
-      <div class="card" style="margin-top:16px">
-        <h3>Price Data Management</h3>
-        <p class="note">Add a new market price record to the historical index. The record is saved locally and can be exported as a backup.</p>
-        <form id="priceForm" style="margin-top:16px">
-          <div class="form-row">
-            <div class="field"><label for="priceDate">Date</label><input id="priceDate" type="date" required></div>
-            <div class="field"><label for="priceValue">Price (IDR / DL)</label><input id="priceValue" type="number" min="0.000001" step="any" required></div>
-          </div>
-          <div class="field"><label for="priceType">Record Type</label><select id="priceType"><option value="daily">Daily</option><option value="monthly">Monthly</option><option value="historical">Historical</option><option value="manual">Manual</option></select></div>
-          <button class="btn primary" type="submit">Add Price Record</button>
-        </form>
-        <p class="note">For dates with existing records, the newest entry is used for that date. The transaction ledger stores its own price snapshot and will not change if a market record is edited or added.</p>
+    </section>
+
+    <section class="page" id="page-account">
+      <div class="section-head">
+        <div><h2>Account &amp; DL Bank</h2><p>Secure account access and manual deposit ticket management.</p></div>
+        <span id="authBadge" class="pill market">Not logged in</span>
       </div>
+      <div class="two-col">
+        <div class="card" id="authCard">
+          <h3>Login / Create Account</h3>
+          <p class="note">Create an account to access your server-side DL bank balance and deposit tickets.</p>
+          <form id="authForm">
+            <div class="field"><label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+            <div class="field"><label for="authPassword">Password</label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" required placeholder="At least 8 characters"></div>
+            <div class="actions">
+              <button class="btn primary" type="submit" id="loginBtn">Login</button>
+              <button class="btn" type="button" id="signupBtn">Create Account</button>
+            </div>
+          </form>
+          <div class="status" id="authStatus">Log in to view your DL bank account.</div>
+          <button class="btn small" id="logoutBtn" type="button" hidden>Log Out</button>
+        </div>
+        <div class="card">
+          <h3>DL Bank Balance</h3>
+          <div class="stat-value" id="bankBalance">— DL</div>
+          <p class="note">This balance is read from the Supabase ledger. It is separate from the local portfolio simulation above.</p>
+          <hr>
+          <h3>Deposit World</h3>
+          <div class="stat-value" id="depositWorld" style="font-size:20px">Not configured</div>
+          <p class="note">Confirm the world name and ticket code before donating. Deposits are credited only after an authorized admin verifies them.</p>
+          <div class="status" id="bankStatus">Log in to load account information.</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <h3>Create Deposit Ticket</h3>
+          <p class="note">Create a ticket for the amount of DL you intend to donate. Do not send anything until you have read the ticket details.</p>
+          <form id="depositForm">
+            <div class="field"><label for="depositAmount">Amount (whole DL)</label><input id="depositAmount" type="number" min="1" max="1000000000" step="1" required placeholder="e.g. 100"></div>
+            <div class="field"><label for="depositNote">Optional note</label><input id="depositNote" maxlength="120" placeholder="Your in-game name (optional)"></div>
+            <button class="btn primary" type="submit" id="createDepositBtn">Generate Deposit Ticket</button>
+          </form>
+          <div class="status" id="depositStatus">You must be logged in to create a ticket.</div>
+          <div id="ticketDetails" class="status" hidden></div>
+        </div>
+        <div class="card">
+          <h3>My Deposit Tickets</h3>
+          <p class="note">Processing target: within 24 hours. This is a target, not a guaranteed completion time.</p>
+          <button class="btn" id="refreshTicketsBtn" type="button">Refresh Tickets</button>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Created</th><th>Type</th><th>Amount</th><th>Status</th><th>Ticket ID</th></tr></thead>
+            <tbody id="myTicketsTable"><tr><td colspan="5" class="empty">Log in to view tickets.</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="card" id="adminPanel" hidden style="margin-top:16px">
+        <div class="section-head" style="margin-top:0">
+          <div><h2>Admin Panel</h2><p>Only authorized Supabase admin accounts can perform these actions.</p></div>
+          <span class="pill add">Admin access</span>
+        </div>
+        <h3>Deposit World Configuration</h3>
+        <form id="worldForm">
+          <div class="field"><label for="worldInput">World name</label><input id="worldInput" maxlength="64" placeholder="WORLDNAME" required></div>
+          <button class="btn primary" type="submit">Save Deposit World</button>
+        </form>
+        <div class="status" id="worldStatus">Set the world users should visit for deposits.</div>
+        <hr>
+        <h3>Pending Deposit Tickets</h3>
+        <p class="note">Verify the in-game donation yourself before confirming a ticket. Confirming credits the user's server-side balance.</p>
+        <button class="btn" id="refreshAdminBtn" type="button">Refresh Pending Tickets</button>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Created</th><th>User ID</th><th>Amount</th><th>Ticket ID</th><th>Reference</th><th>Action</th></tr></thead>
+          <tbody id="adminTicketsTable"><tr><td colspan="6" class="empty">No tickets loaded.</td></tr></tbody>
+        </table></div>
+      </div>
+      <p class="note" style="margin-top:16px">Security note: Never share your password or Supabase secret/service_role key. The public website key is not a substitute for database access controls.</p>
     </section>
   </main>
-  <footer class="footer"><span>LOCKLEDGER · GROWTOPIA ECONOMY TRACKER</span><span>Local prototype · Not affiliated with Growtopia</span></footer>
+  <footer class="footer"><span>LockLedger · Growtopia Economy Index</span><span>Historical data may be unverified · Use responsibly</span></footer>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (() => {
 'use strict';
 
-const STORAGE_KEY = 'gt-economy-index-v3';
-const LEGACY_KEY = 'gt-economy-index-v2';
-const $ = id => document.getElementById(id);
-const today = () => new Date().toISOString().slice(0,10);
-const nowLocalInput = () => {
-  const d = new Date();
-  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-  return d.toISOString().slice(0,16);
-};
-const number = n => Number.isFinite(Number(n)) ? Number(n) : 0;
-const escapeHTML = s => String(s ?? '').replace(/[&<>"']/g, c => ({
-  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-}[c]));
+const SUPABASE_URL = 'https://rfjxjtbzfmgdfwjkfrbf.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_fT4UEprByyYGxOcPLXdd5A_hc3epZWw';
 
-const historical = [
- ['2016-06-30',240000,'historical'],['2016-12-31',210000,'historical'],
- ['2017-06-30',150000,'historical'],['2017-12-31',100000,'historical'],
- ['2018-06-30',65000,'historical'],['2018-12-31',50000,'historical'],
- ['2019-06-30',45000,'historical'],['2019-12-31',35000,'historical'],
- ['2020-06-30',30000,'historical'],['2020-12-31',20000,'historical'],
- ['2021-06-30',21000,'historical'],['2021-12-31',12000,'historical'],
- ['2022-06-30',25000,'historical'],['2022-12-31',4500,'historical'],
- ['2023-06-30',3450,'historical'],['2023-12-31',3550,'historical'],
- ['2024-06-30',3600,'historical'],['2024-12-31',3600,'historical'],
- ['2025-06-30',2500,'historical'],['2025-12-31',300,'historical']
-].map(([date,price,type]) => ({date,price,type,source:'seed'}));
-
-const monthly = [
- ['2026-01-31',300],['2026-02-28',300],['2026-03-31',250],
- ['2026-04-30',150],['2026-05-31',315],['2026-06-30',330],
- ['2026-07-31',420],['2026-08-31',440],['2026-09-30',460]
-].map(([date,price]) => ({date,price,type:'monthly',source:'seed'}));
-
-const dailyPrices = [
- 500,700,845,790,790,785,780,820,850,820,850,860,810,
- 790,825,815,820,825,805,805,835,850,870,850,845
-].map((price,i) => ({
- date:`2026-10-${String(i+1).padStart(2,'0')}`,
- price,type:'daily',source:'seed'
-}));
-
-function makeInitialState(){
- return {version:3,currency:'IDR',fxRate:16000,transactions:[],manualPrices:[],openingBalance:0};
-}
-function readState(){
- const fresh = makeInitialState();
- try{
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if(raw){
-   const saved = JSON.parse(raw);
-   return {...fresh,...saved,
-    transactions:Array.isArray(saved.transactions)?saved.transactions:[],
-    manualPrices:Array.isArray(saved.manualPrices)?saved.manualPrices:[]};
-  }
- }catch(e){console.warn('Could not read saved data',e)}
- // Migrate portfolio data only; seed price history remains in code.
- try{
-  const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY)||'null');
-  if(legacy && Array.isArray(legacy.manualPrices)) fresh.manualPrices=legacy.manualPrices;
-  if(legacy && Array.isArray(legacy.prices)){
-   fresh.manualPrices=legacy.prices.filter(p=>p && p.date && Number(p.price)>0)
-    .map(p=>({date:p.date,price:Number(p.price),type:p.type||'manual',source:'migrated'}));
-  }
- }catch(e){console.warn('Legacy migration skipped',e)}
- return fresh;
-}
-let state = readState();
-let chartRange = '1M';
-let animationFrame = 0;
-let chartPoints = [];
-let hoverIndex = -1;
-
-function saveState(){
- try{
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
-  $('dataStatus').textContent='Saved locally in this browser.';
- }catch(e){
-  $('dataStatus').textContent='Could not save data. Browser storage may be full or unavailable.';
-  console.error(e);
- }
-}
-function allPrices(){
- const map = new Map();
- [...historical,...monthly,...dailyPrices,...state.manualPrices].forEach(p=>{
-  if(p && p.date && number(p.price)>0){
-   const old=map.get(p.date);
-   if(!old || p.source!=='seed') map.set(p.date,{...p,price:number(p.price)});
-  }
- });
- return [...map.values()].sort((a,b)=>a.date.localeCompare(b.date));
-}
-function latestPriceRecord(){
- const a=allPrices(); return a[a.length-1]||{date:today(),price:0,type:'none'};
-}
-function currentPrice(){return number(latestPriceRecord().price)}
-function fmtMoney(idr, currency=state.currency){
- const v=currency==='USD'?number(idr)/Math.max(1,number(state.fxRate)):number(idr);
- try{
-  return new Intl.NumberFormat(currency==='USD'?'en-US':'id-ID',{
-   style:'currency',currency,maximumFractionDigits:currency==='IDR'?0:2
-  }).format(v);
- }catch{return (currency==='USD'?'$':'Rp')+Math.round(v).toLocaleString()}
-}
-function fmtNumber(v, digits=4){
- return new Intl.NumberFormat('en-US',{maximumFractionDigits:digits}).format(number(v));
-}
-function fmtDate(s){
- const d=new Date(`${s}T00:00:00`);
- return Number.isNaN(d.getTime())?s:d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-}
-function fmtDateTime(s){
- const d=new Date(s);
- return Number.isNaN(d.getTime())?s:d.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-}
-function transactionBalance(){
- return number(state.openingBalance)+state.transactions.reduce((sum,t)=>
-  sum+(t.type==='add'?number(t.amount):-number(t.amount)),0);
-}
-function totals(){
- const added=state.transactions.filter(t=>t.type==='add').reduce((s,t)=>s+number(t.amount),0);
- const removed=state.transactions.filter(t=>t.type==='remove').reduce((s,t)=>s+number(t.amount),0);
- const netCost=state.transactions.reduce((s,t)=>s+(t.type==='add'?1:-1)*number(t.amount)*number(t.priceIdr),0);
- return {added,removed,net:added-removed,netCost};
-}
-function baseline(){
- const first=state.transactions.slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)))[0];
- return first ? number(first.priceIdr) : currentPrice();
-}
-function marketEffect(){
- const bal=transactionBalance();
- const first=baseline();
- // Price effect on today's holdings is deliberately not called realized profit.
- return {effect:bal*(currentPrice()-first),baseValue:bal*first,returnPct:first>0?(currentPrice()-first)/first*100:0};
-}
-function setSigned(el,value,formatter=fmtMoney){
- el.textContent=(value>0?'+':'')+formatter(value);
- el.classList.toggle('positive',value>0);
- el.classList.toggle('negative',value<0);
-}
-function renderSummary(){
- const latest=latestPriceRecord();
- const prices=allPrices();
- const prev=prices.length>1?prices[prices.length-2]:latest;
- const balance=transactionBalance();
- const value=balance*currentPrice();
- $('latestPrice').textContent=fmtMoney(latest.price);
- $('latestDate').textContent=`Last record: ${fmtDate(latest.date)}`;
- $('previousPrice').textContent=fmtMoney(prev.price);
- const delta=latest.price-prev.price;
- const pct=prev.price?delta/prev.price*100:0;
- $('priceChange').textContent=`${delta>0?'+':''}${pct.toFixed(2)}% vs previous record`;
- $('priceChange').className='stat-foot '+(delta>0?'positive':delta<0?'negative':'neutral');
- $('marketBalance').textContent=fmtNumber(balance)+' DL';
- $('marketValue').textContent=fmtMoney(value);
- $('portfolioBalance').textContent=fmtNumber(balance)+' DL';
- $('portfolioValue').textContent=fmtMoney(value);
- const perf=marketEffect();
- setSigned($('marketPL'),perf.effect);
- setSigned($('detailMarketPL'),perf.effect);
- $('marketReturn').textContent=`${perf.returnPct>=0?'+':''}${perf.returnPct.toFixed(2)}%`;
- $('marketReturn').className='stat-value '+(perf.returnPct>0?'positive':perf.returnPct<0?'negative':'neutral');
- $('netDL').textContent=(totals().net>0?'+':'')+fmtNumber(totals().net)+' DL';
- $('netCost').textContent=fmtMoney(totals().netCost);
- renderRecentPrices();
-}
-function renderRecentPrices(){
- const rows=allPrices().slice(-8).reverse();
- $('recentPrices').innerHTML=rows.map(p=>`<tr>
-  <td>${escapeHTML(fmtDate(p.date))}</td><td>${escapeHTML(fmtMoney(p.price))}</td>
-  <td><span class="pill market">${escapeHTML(p.type||'manual')}</span></td></tr>`).join('');
-}
-function chartData(range){
- const prices=allPrices();
- if(range==='1M'){
-  const currentMonth=today().slice(0,7);
-  const chosen=prices.filter(p=>p.date.slice(0,7)===currentMonth);
-  const days=new Date(Number(currentMonth.slice(0,4)),Number(currentMonth.slice(5,7)),0).getDate();
-  return Array.from({length:days},(_,i)=>{
-   const day=String(i+1).padStart(2,'0');
-   const date=`${currentMonth}-${day}`;
-   const p=chosen.find(x=>x.date===date);
-   return {label:String(i+1),date,value:p?p.price:null};
-  });
- }
- if(range==='1Y'){
-  const year=String(new Date().getFullYear());
-  const arr=[];
-  for(let m=1;m<=12;m++){
-   const month=`${year}-${String(m).padStart(2,'0')}`;
-   const monthRows=prices.filter(p=>p.date.slice(0,7)===month);
-   let value=null;
-   const monthlyRow=monthRows.filter(p=>p.type==='monthly'||p.type==='historical').at(-1);
-   if(monthlyRow)value=monthlyRow.price;
-   else if(monthRows.length){
-    const daily=monthRows.filter(p=>p.type==='daily'||p.type==='manual');
-    if(daily.length)value=daily.reduce((s,p)=>s+p.price,0)/daily.length;
-    else value=monthRows[monthRows.length-1].price;
-   }
-   arr.push({label:new Date(Number(year),m-1,1).toLocaleDateString('en-US',{month:'short'}),date:month,value});
-  }
-  return arr;
- }
- const byYear=new Map();
- prices.forEach(p=>{
-  const year=p.date.slice(0,4);
-  if(!byYear.has(year))byYear.set(year,{s1:[],s2:[]});
-  const month=Number(p.date.slice(5,7));
-  byYear.get(year)[month<=6?'s1':'s2'].push(p.price);
- });
- const out=[];
- for(const [year,halves] of byYear){
-  for(const [key,label] of [['s1','H1'],['s2','H2']]){
-   if(halves[key].length){
-    out.push({label:`${label} ${year}`,date:`${year}-${key}`,value:
-      halves[key].reduce((s,v)=>s+v,0)/halves[key].length});
-   }
-  }
- }
- return out;
-}
-function drawChart(animate=true){
- const canvas=$('priceChart'),ctx=canvas.getContext('2d');
- const rect=canvas.getBoundingClientRect();
- const dpr=Math.min(window.devicePixelRatio||1,2);
- const W=Math.max(300,rect.width),H=Math.max(220,rect.height);
- canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
- ctx.setTransform(dpr,0,0,dpr,0,0);
- const data=chartData(chartRange);
- chartPoints=data;
- const valid=data.map((p,i)=>({...p,i})).filter(p=>p.value!==null&&Number.isFinite(p.value));
- ctx.clearRect(0,0,W,H);
- const css=getComputedStyle(document.documentElement);
- const muted=css.getPropertyValue('--muted').trim();
- const green=css.getPropertyValue('--green').trim();
- const line=css.getPropertyValue('--line').trim();
- const pad={l:64,r:16,t:20,b:38};
- const pw=W-pad.l-pad.r,ph=H-pad.t-pad.b;
- if(!valid.length){
-  ctx.fillStyle=muted;ctx.font='13px system-ui';ctx.textAlign='center';
-  ctx.fillText('No price records for this period yet.',W/2,H/2);
-  $('chartSubtitle').textContent=chartRange==='1M'?'Daily prices · Current month':
-   chartRange==='1Y'?'Monthly prices · Current year':'Historical prices · Semester averages';
+if (!window.supabase) {
+  alert('Supabase SDK gagal dimuat. Periksa koneksi internet.');
   return;
- }
- const vals=valid.map(p=>p.value);
- let min=Math.min(...vals),max=Math.max(...vals);
- if(min===max){min*=.9;max*=1.1}
- const logScale=max/min>20 && min>0;
- const transform=v=>logScale?Math.log(v):v;
- let lo=transform(min),hi=transform(max);
- const yMin=lo-(hi-lo)*.08,yMax=hi+(hi-lo)*.08;
- const x=i=>pad.l+(data.length<=1?pw/2:(i/(data.length-1))*pw);
- const y=v=>pad.t+ph-(transform(v)-yMin)/(yMax-yMin)*ph;
+}
 
- ctx.font='11px system-ui';ctx.textAlign='right';ctx.textBaseline='middle';
- for(let j=0;j<5;j++){
-  const v=yMin+(yMax-yMin)*j/4;
-  const yy=pad.t+ph-j*ph/4;
-  ctx.strokeStyle=line;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(W-pad.r,yy);ctx.stroke();
-  ctx.fillStyle=muted;
-  const shown=logScale?Math.exp(v):v;
-  ctx.fillText(compactPrice(shown),pad.l-9,yy);
- }
- ctx.textAlign='center';ctx.textBaseline='top';
- const ticks=Math.min(6,data.length);
- for(let j=0;j<ticks;j++){
-  const idx=Math.round(j*(data.length-1)/Math.max(1,ticks-1));
-  ctx.fillStyle=muted;ctx.fillText(data[idx].label,x(idx),H-pad.b+12);
- }
- const points=valid.map(p=>({x:x(p.i),y:y(p.value),...p}));
- const progress=animate&&!matchMedia('(prefers-reduced-motion: reduce)').matches?0:1;
- if(progress===0){
-  cancelAnimationFrame(animationFrame);
-  const start=performance.now(),duration=460;
-  const render=t=>{
-   const k=Math.min(1,(t-start)/duration);
-   const eased=1-Math.pow(1-k,3);
-   paintLine(ctx,points,pad,ph,green,eased);
-   if(k<1)animationFrame=requestAnimationFrame(render);
-  };
-  animationFrame=requestAnimationFrame(render);
- }else paintLine(ctx,points,pad,ph,green,1);
- $('chartSubtitle').textContent=(chartRange==='1M'?'Daily prices · Current month':
-   chartRange==='1Y'?'Monthly observations · Current year':'Historical observations · Semester averages')
-   +(logScale?' · Log scale':'');
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = id => document.getElementById(id);
+
+let currentUser = null;
+let isAdmin = false;
+
+function status(id, message, error = false) {
+  const el = $(id);
+  if (!el) return;
+  el.textContent = message;
+  el.style.color = error ? 'var(--red)' : 'var(--muted)';
 }
-function compactPrice(v){
- if(v>=1000000)return (v/1000000).toFixed(1)+'M';
- if(v>=1000)return (v/1000).toFixed(v>=10000?0:1)+'K';
- return new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(v);
+
+function formatDL(value) {
+  return Number(value || 0).toLocaleString('en-US') + ' DL';
 }
-function paintLine(ctx,points,pad,ph,color,progress){
- const W=ctx.canvas.width/(Math.min(window.devicePixelRatio||1,2));
- const dpr=Math.min(window.devicePixelRatio||1,2);
- const css=getComputedStyle(document.documentElement);
- ctx.save();ctx.setTransform(dpr,0,0,dpr,0,0);
- // Clear only the plot area; grid and labels are redrawn below on every frame.
- ctx.clearRect(pad.l-1,pad.t-1,W-pad.l-pad.r+2,ph+2);
- // Recreate grid behind the animated series.
- ctx.strokeStyle=css.getPropertyValue('--line').trim();ctx.lineWidth=1;
- for(let j=0;j<5;j++){
-  const yy=pad.t+ph-j*ph/4;
-  ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(W-pad.r,yy);ctx.stroke();
- }
- const count=Math.max(1,Math.ceil(points.length*progress));
- const shown=points.slice(0,count);
- if(shown.length){
-  ctx.beginPath();
-  shown.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
-  if(progress>=1 && shown.length>1){
-   const last=shown[shown.length-1],first=shown[0];
-   const gradient=ctx.createLinearGradient(0,pad.t,0,pad.t+ph);
-   gradient.addColorStop(0,'rgba(74,222,128,.20)');
-   gradient.addColorStop(1,'rgba(74,222,128,0)');
-   ctx.lineTo(last.x,pad.t+ph);ctx.lineTo(first.x,pad.t+ph);ctx.closePath();
-   ctx.fillStyle=gradient;ctx.fill();
+
+function safeText(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  })[ch]);
+}
+
+function formatDate(value) {
+  if (!value) return '—';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString();
+}
+
+function showTicketDetails(ticketId, amount, world) {
+  const el = $('ticketDetails');
+  el.hidden = false;
+  el.replaceChildren();
+
+  const title = document.createElement('strong');
+  title.textContent = 'Deposit ticket created';
+
+  const details = document.createElement('p');
+  details.textContent =
+    'Ticket ID: ' + ticketId +
+    '\nAmount: ' + formatDL(amount) +
+    '\nDeposit world: ' + (world || 'Belum dikonfigurasi') +
+    '\nStatus: Pending verification';
+
+  details.style.whiteSpace = 'pre-wrap';
+  details.style.overflowWrap = 'anywhere';
+
+  el.append(title, details);
+
+  const copy = document.createElement('button');
+  copy.type = 'button';
+  copy.className = 'btn small';
+  copy.textContent = 'Copy Ticket ID';
+
+  copy.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(ticketId);
+      copy.textContent = 'Copied';
+    } catch {
+      status('depositStatus', 'Salin Ticket ID ini secara manual: ' + ticketId);
+    }
+  });
+
+  el.append(document.createElement('br'), copy);
+}
+
+async function getWorld() {
+  const { data, error } = await db.rpc('get_deposit_world');
+  if (error) {
+    $('depositWorld').textContent = 'Unavailable';
+    return null;
   }
-  ctx.beginPath();
-  shown.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
-  ctx.strokeStyle=color;ctx.lineWidth=2.4;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
-  const last=shown[shown.length-1];
-  ctx.beginPath();ctx.arc(last.x,last.y,4,0,Math.PI*2);
-  ctx.fillStyle=color;ctx.fill();
- }
- ctx.restore();
-}
-function showTooltip(event){
- if(!chartPoints.length)return;
- const canvas=$('priceChart'),rect=canvas.getBoundingClientRect();
- const px=event.clientX-rect.left;
- const data=chartPoints;
- const idx=Math.max(0,Math.min(data.length-1,Math.round(px/rect.width*(data.length-1))));
- const p=data[idx];
- if(!p||p.value===null){$('chartTooltip').style.display='none';return}
- const tip=$('chartTooltip');
- tip.style.display='block';
- tip.innerHTML=`<span>${escapeHTML(p.date||p.label)}</span><strong>${escapeHTML(fmtMoney(p.value))}</strong>`;
- const left=Math.max(4,Math.min(rect.width-150,px+12));
- tip.style.left=left+'px';tip.style.top='24px';
-}
-function hideTooltip(){$('chartTooltip').style.display='none'}
-function renderTransactions(){
- const tx=state.transactions.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
- const totalsNow=totals();
- $('totalAdded').textContent=fmtNumber(totalsNow.added)+' DL';
- $('totalRemoved').textContent=fmtNumber(totalsNow.removed)+' DL';
- $('txCount').textContent=String(tx.length);
- $('netFlow').textContent=(totalsNow.net>0?'+':'')+fmtNumber(totalsNow.net)+' DL';
- $('netFlow').className='stat-value '+(totalsNow.net>0?'positive':totalsNow.net<0?'negative':'');
- const filter=$('txFilter').value;
- const shown=tx.filter(t=>filter==='all'||t.type===filter);
- $('txTable').innerHTML=shown.length?shown.map(t=>{
-  const isAdd=t.type==='add';
-  const value=number(t.amount)*number(t.priceIdr);
-  return `<tr>
-   <td>${escapeHTML(fmtDateTime(t.date))}</td>
-   <td><span class="pill ${isAdd?'add':'remove'}">${isAdd?'ADD':'REMOVE'}</span></td>
-   <td class="${isAdd?'positive':'negative'}">${isAdd?'+':'−'}${escapeHTML(fmtNumber(t.amount))} DL</td>
-   <td>${escapeHTML(fmtMoney(t.priceIdr,'IDR'))}</td>
-   <td>${escapeHTML(fmtNumber(t.fxRate,2))} IDR/USD</td>
-   <td>${escapeHTML(fmtMoney(value,'IDR'))}<br><span class="note">${escapeHTML(fmtMoney(value/Math.max(1,number(t.fxRate)),'USD'))} at entry</span></td>
-   <td>${escapeHTML(t.note||'—')}</td>
-   <td><button class="btn small danger" data-delete="${escapeHTML(t.id)}">Delete</button></td>
-  </tr>`;
- }).join(''):'<tr><td colspan="8" class="empty">No transactions recorded yet.</td></tr>';
-}
-function renderAll(){
- $('currencySelect').value=state.currency;
- $('fxRate').value=state.fxRate;
- renderSummary();renderTransactions();drawChart(false);
-}
-function setPage(page){
- document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===`page-${page}`));
- document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
- if(page==='market')requestAnimationFrame(()=>drawChart(false));
-}
-document.querySelectorAll('.navbtn').forEach(btn=>btn.addEventListener('click',()=>setPage(btn.dataset.page)));
-document.querySelectorAll('[data-range]').forEach(btn=>btn.addEventListener('click',()=>{
- chartRange=btn.dataset.range;
- document.querySelectorAll('[data-range]').forEach(b=>b.classList.toggle('active',b===btn));
- drawChart(true);
-}));
-$('currencySelect').addEventListener('change',()=>{
- state.currency=$('currencySelect').value;saveState();renderAll();
-});
-$('priceChart').addEventListener('mousemove',showTooltip);
-$('priceChart').addEventListener('mouseleave',hideTooltip);
-$('priceChart').addEventListener('touchstart',e=>{if(e.touches[0])showTooltip(e.touches[0])},{passive:true});
-$('priceChart').addEventListener('touchmove',e=>{if(e.touches[0])showTooltip(e.touches[0])},{passive:true});
 
-$('transactionForm').addEventListener('submit',e=>{
- e.preventDefault();
- const type=$('txType').value;
- const amount=number($('txAmount').value);
- const priceIdr=number($('txPrice').value);
- const date=$('txDate').value;
- if(amount<=0||priceIdr<=0||!date){$('txStatus').textContent='Enter a valid amount, price, and date.';return}
- if(type==='remove'&&amount>transactionBalance()){
-  $('txStatus').textContent=`Insufficient balance. Current balance: ${fmtNumber(transactionBalance())} DL.`;return;
- }
- const tx={
-  id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2),
-  type,amount,priceIdr,date,note:$('txNote').value.trim(),
-  fxRate:number(state.fxRate),currencyAtEntry:state.currency,
-  valueIdr:amount*priceIdr,valueUsdAtEntry:amount*priceIdr/Math.max(1,number(state.fxRate)),
-  createdAt:new Date().toISOString()
- };
- state.transactions.push(tx);saveState();renderAll();
- $('txStatus').textContent=`Saved ${type==='add'?'addition':'removal'} of ${fmtNumber(amount)} DL at ${fmtMoney(priceIdr,'IDR')} per DL. FX snapshot: ${fmtNumber(tx.fxRate,2)} IDR/USD.`;
- $('txAmount').value='';$('txNote').value='';
- setPage('transactions');
-});
-$('txDate').value=nowLocalInput();
-$('txPrice').value=currentPrice();
+  const world = typeof data === 'string' ? data : null;
+  $('depositWorld').textContent = world || 'Belum dikonfigurasi';
+  return world;
+}
 
-$('txFilter').addEventListener('change',renderTransactions);
-$('txTable').addEventListener('click',e=>{
- const btn=e.target.closest('[data-delete]');if(!btn)return;
- const tx=state.transactions.find(t=>t.id===btn.dataset.delete);
- if(!tx)return;
- if(!confirm('Delete this transaction? The portfolio balance will be recalculated.'))return;
- state.transactions=state.transactions.filter(t=>t.id!==tx.id);
- saveState();renderAll();
-});
-$('settingsForm').addEventListener('submit',e=>{
- e.preventDefault();
- const fx=number($('fxRate').value);
- if(fx<=0){$('fxStatus').textContent='Enter a valid positive exchange rate.';return}
- state.fxRate=fx;saveState();renderAll();
- $('fxStatus').textContent=`Saved: 1 USD = ${fmtNumber(fx,2)} IDR. Historical transaction snapshots remain unchanged.`;
-});
-$('priceForm').addEventListener('submit',e=>{
- e.preventDefault();
- const date=$('priceDate').value,price=number($('priceValue').value),type=$('priceType').value;
- if(!date||price<=0)return;
- state.manualPrices.push({date,price,type,source:'manual',createdAt:new Date().toISOString()});
- saveState();renderAll();$('txPrice').value=currentPrice();
- $('dataStatus').textContent=`Saved market record: ${fmtDate(date)} · ${fmtMoney(price,'IDR')} per DL.`;
- $('priceForm').reset();$('priceDate').value=today();
-});
-function download(filename,content,type='text/plain'){
- const blob=new Blob([content],{type});
- const url=URL.createObjectURL(blob);
- const a=document.createElement('a');a.href=url;a.download=filename;a.click();
- setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-function csvCell(v){return '"'+String(v??'').replace(/"/g,'""')+'"'}
-function exportTransactions(){
- const rows=[['id','date','type','amount_dl','price_idr_per_dl','fx_idr_per_usd','value_idr_at_entry','value_usd_at_entry','note']];
- state.transactions.forEach(t=>rows.push([t.id,t.date,t.type,t.amount,t.priceIdr,t.fxRate,
-  t.valueIdr??t.amount*t.priceIdr,t.valueUsdAtEntry??(t.amount*t.priceIdr/Math.max(1,t.fxRate)),t.note]));
- download('lockledger-transactions.csv',rows.map(r=>r.map(csvCell).join(',')).join('\n'),'text/csv;charset=utf-8');
-}
-function exportPrices(){
- const rows=[['date','price_idr_per_dl','type'],...allPrices().map(p=>[p.date,p.price,p.type])];
- download('lockledger-prices.csv',rows.map(r=>r.map(csvCell).join(',')).join('\n'),'text/csv;charset=utf-8');
-}
-$('exportBtn').addEventListener('click',exportPrices);
-$('exportTxBtn').addEventListener('click',exportTransactions);
-$('exportAllBtn').addEventListener('click',()=>{
- download('lockledger-backup.json',JSON.stringify({state,prices:allPrices(),exportedAt:new Date().toISOString()},null,2),'application/json');
-});
-$('importBtn').addEventListener('click',()=>$('importFile').click());
-$('importFile').addEventListener('change',async e=>{
- const file=e.target.files[0];if(!file)return;
- try{
-  const data=JSON.parse(await file.text());
-  const imported=data.state||data;
-  if(!imported||!Array.isArray(imported.transactions)||!Array.isArray(imported.manualPrices))
-   throw new Error('Invalid backup format');
-  if(!confirm('Import this backup and replace the current local portfolio data?'))return;
-  state={...makeInitialState(),...imported};
-  saveState();renderAll();
-  $('dataStatus').textContent='Backup imported successfully.';
- }catch(err){alert('Could not import backup: '+err.message)}
- finally{e.target.value=''}
-});
-$('resetBtn').addEventListener('click',()=>{
- if(!confirm('Reset local transactions, balance, manual prices, and currency settings? Export a backup first if needed.'))return;
- state=makeInitialState();saveState();renderAll();
- $('txStatus').textContent='Portfolio data has been reset.';
- $('fxStatus').textContent='Default exchange rate restored.';
-});
-$('priceDate').value=today();
-$('fxStatus').textContent=`Current rate: 1 USD = ${fmtNumber(state.fxRate,2)} IDR.`;
-window.addEventListener('resize',()=>drawChart(false));
+async function loadBalance() {
+  if (!currentUser) {
+    $('bankBalance').textContent = '— DL';
+    return;
+  }
 
-renderAll();
-})();
+  const { data, error } = await db.rpc('get_my_dl_balance');
+
+  if (error) {
+    status('bankStatus', 'Gagal memuat saldo: ' + error.message, true);
+    return;
+  }
+
+  $('bankBalance').textContent = formatDL(data);
+  status('bankStatus', 'Saldo berhasil dimuat dari ledger Supabase.');
+}
+
+async function loadMyTickets() {
+  const tbody = $('myTicketsTable');
+
+  if (!currentUser) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">Login untuk melihat tiket.</td></tr>';
+    return;
+  }
+
+  /*
+   * Requires the authenticated read-my-tickets RPC
+   * created in the additional SQL migration.
+   */
+  const { data, error } = await db.rpc('get_my_transfer_requests');
+
+  if (error) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">Gagal memuat tiket.</td></tr>';
+    status('bankStatus', 'Tiket: ' + error.message, true);
+    return;
+  }
+
+  if (!Array.isArray(data) || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">Belum ada tiket.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.map(ticket => `
+    <tr>
+      <td>${safeText(formatDate(ticket.created_at))}</td>
+      <td>${safeText(ticket.request_type)}</td>
+      <td>${safeText(formatDL(ticket.amount_dl))}</td>
+      <td><span class="pill ${ticket.status === 'completed' ? 'add' : 'market'}">${safeText(ticket.status)}</span></td>
+      <td title="${safeText(ticket.id)}">${safeText(ticket.id)}</td>
+    </tr>
+  `).join('');
+}
+
+async function loadAdminTickets() {
+  if (!currentUser || !isAdmin) return;
+
+  const tbody = $('adminTicketsTable');
+  tbody.innerHTML = '<tr><td colspan="6" class="empty">Memuat tiket...</td></tr>';
+
+  const { data, error } = await db.rpc('admin_get_pending_deposits');
+
+  if (error) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Gagal memuat tiket admin.</td></tr>';
+    status('worldStatus', 'Admin tickets: ' + error.message, true);
+    return;
+  }
+
+  if (!Array.isArray(data) || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Tidak ada deposit pending.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.map(ticket => `
+    <tr>
+      <td>${safeText(formatDate(ticket.created_at))}</td>
+      <td title="${safeText(ticket.user_id)}">${safeText(ticket.user_id)}</td>
+      <td>${safeText(formatDL(ticket.amount_dl))}</td>
+      <td title="${safeText(ticket.id)}">${safeText(ticket.id)}</td>
+      <td>${safeText(ticket.reference_note || '—')}</td>
+      <td><button class="btn primary small" data-complete="${safeText(ticket.id)}">Verify &amp; Credit</button></td>
+    </tr>
+  `).join('');
+}
+
+async function loadAccount() {
+  const { data: { user }, error } = await db.auth.getUser();
+
+  if (error) console.warn('Auth check:', error.message);
+
+  currentUser = user || null;
+  isAdmin = false;
+
+  $('authBadge').textContent = currentUser ? 'Logged in' : 'Not logged in';
+  $('logoutBtn').hidden = !currentUser;
+  $('loginBtn').hidden = !!currentUser;
+  $('signupBtn').hidden = !!currentUser;
+  $('authEmail').disabled = !!currentUser;
+  $('authPassword').disabled = !!currentUser;
+
+  if (!currentUser) {
+    $('adminPanel').hidden = true;
+    $('bankBalance').textContent = '— DL';
+    $('depositWorld').textContent = 'Login required';
+    status('authStatus', 'Silakan login untuk menggunakan DL Bank.');
+    status('bankStatus', 'Login untuk memuat saldo dan tiket.');
+    await getWorld();
+    await loadMyTickets();
+    return;
+  }
+
+  status('authStatus', 'Login sebagai ' + currentUser.email);
+  await loadBalance();
+  await getWorld();
+  await loadMyTickets();
+
+  const { data: adminResult, error: adminError } =
+    await db.rpc('is_lockledger_admin');
+
+  isAdmin = !adminError && adminResult === true;
+  $('adminPanel').hidden = !isAdmin;
+
+  if (isAdmin) {
+    status('worldStatus', 'Akun terverifikasi sebagai admin.');
+    await loadAdminTickets();
+  }
+}
+
+$('authForm').addEventListener('submit', async event => {
+  event.preventDefault();
+
+  const email = $('authEmail').value.trim();
+  const password = $('authPassword').value;
+
+  status('authStatus', 'Sedang login...');
+
+  const { error } = await db.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    status('authStatus', error.message, true);
+    return;
+  }
+
+  status('authStatus', 'Login berhasil.');
+  await loadAccount();
+});
+
+$('signupBtn').addEventListener('click', async () => {
+  const email = $('authEmail').value.trim();
+  const password = $('authPassword').value;
+
+  if (!email || password.length < 8) {
+    status('authStatus', 'Masukkan email dan password minimal 8 karakter.', true);
+    return;
+  }
+
+  status('authStatus', 'Membuat akun...');
+
+  const { data, error } = await db.auth.signUp({ email, password });
+
+  if (error) {
+    status('authStatus', error.message, true);
+    return;
+  }
+
+  if (!data.session) {
+    status('authStatus', 'Pendaftaran berhasil. Periksa email untuk verifikasi, lalu login.');
+    return;
+  }
+
+  status('authStatus', 'Akun dibuat.');
+  await loadAccount();
+});
+
+$('logoutBtn').addEventListener('click', async () => {
+  const { error } = await db.auth.signOut();
+
+  if (error) {
+    status('authStatus', error.message, true);
+    return;
+  }
+
+  currentUser = null;
+  isAdmin = false;
+  await loadAccount();
+});
+
+$('depositForm').addEventListener('submit', async event => {
+  event.preventDefault();
+
+  if (!currentUser) {
+    status('depositStatus', 'Login terlebih dahulu.', true);
+    return;
+  }
+
+  const amount = Number($('depositAmount').value);
+  const note = $('depositNote').value.trim();
+
+  if (!Number.isSafeInteger(amount) || amount < 1 || amount > 1000000000) {
+    status('depositStatus', 'Jumlah harus berupa bilangan bulat DL yang valid.', true);
+    return;
+  }
+
+  $('createDepositBtn').disabled = true;
+  status('depositStatus', 'Membuat tiket deposit...');
+
+  try {
+    const { data: ticketId, error } = await db.rpc('create_transfer_request', {
+      p_request_type: 'deposit',
+      p_amount_dl: amount,
+      p_reference_note: note || null
+    });
+
+    if (error) throw error;
+    if (!ticketId) throw new Error('Database tidak mengembalikan ID tiket.');
+
+    const world = await getWorld();
+    showTicketDetails(ticketId, amount, world);
+
+    status('depositStatus',
+      'Tiket dibuat. Tunggu petunjuk admin dan jangan mengirim DL sebelum detail tiket dikonfirmasi.');
+    $('depositAmount').value = '';
+    $('depositNote').value = '';
+
+    await loadMyTickets();
+  } catch (error) {
+    status('depositStatus', error.message || 'Gagal membuat tiket.', true);
+  } finally {
+    $('createDepositBtn').disabled = false;
+  }
+});
+
+$('refreshTicketsBtn').addEventListener('click', loadMyTickets);
+$('refreshAdminBtn').addEventListener('click', loadAdminTickets);
+
+$('worldForm').addEventListener('submit', async event => {
+  event.preventDefault();
+
+  if (!isAdmin) {
+    status('worldStatus', 'Akses admin diperlukan.', true);
+    return;
+  }
+
+  const world = $('worldInput').value.trim();
+  if (!world) return;
+
+  const { error } = await db.rpc('admin_set_deposit_world', {
+    p_world_name: world
+  });
+
+  if (error) {
+    status('worldStatus', error.message, true);
+    return;
+  }
+
+  status('worldStatus', 'World deposit berhasil diperbarui.');
+  $('worldInput').value = '';
+  await getWorld();
+});
+
+$('adminTicketsTable').addEventListener('click', async event => {
+  const button = event.target.closest('[data-complete]');
+  if (!button) return;
+
+  if (!isAdmin) {
+    status('worldStatus', 'Akses admin diperlukan.', true);
+    return;
+  }
+
+  const ticketId = button.dataset.complete;
+
+  if (!confirm(
+    'Pastikan donasi sudah benar-benar diperiksa di Growtopia. ' +
+    'Konfirmasi akan menambah saldo pengguna. Lanjutkan?'
+  )) return;
+
+  const note = prompt('Catatan verifikasi (opsional):') || null;
+  button.disabled = true;
+
+  const { error } = await db.rpc('admin_complete_deposit', {
+    p_request_id: ticketId,
+    p_reference_note: note
+  });
+
+  if (error) {
+    status('worldStatus', error.message, true);
+    button.disabled = false;
+    return;
+  }
+
+  status('worldStatus', 'Deposit terkonfirmasi dan dicatat.');
+  await loadAdminTickets();
+  await loadMyTickets();
+  await loadBalance();
+});
+
+db.auth.onAuthStateChange(() => {
+  setTimeout(() => loadAccount(), 0);
+});
+
+loadAccount().catch(error => {
+  status('authStatus', error.message || 'Gagal menginisialisasi akun.', true);
+});
 </script>
 </body>
 </html>
